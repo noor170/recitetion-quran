@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
- 
+
       - name: 3. Set up Java JDK 21
         uses: actions/setup-java@v5
         with:
@@ -43,14 +43,16 @@ jobs:
           npx cap init "Dhaka Azan" "com.dhaka.azan" --web-dir "www"
           npx cap add android
 
-      - name: 7. Enable Autoplay & Permissions in Android Source
+      - name: 7. Enable Autoplay, Recording & Permissions in Android Source
         run: |
-          # Enable media autoplay in MainActivity
+          # Configure MainActivity to support autoplay and grant Web Chrome media/microphone requests
           MAIN_ACTIVITY_PATH="android/app/src/main/java/com/dhaka/azan/MainActivity.java"
           cat << 'EOF' > $MAIN_ACTIVITY_PATH
           package com.dhaka.azan;
 
           import android.os.Bundle;
+          import android.webkit.PermissionRequest;
+          import android.webkit.WebChromeClient;
           import android.webkit.WebSettings;
           import com.getcapacitor.BridgeActivity;
 
@@ -63,14 +65,22 @@ jobs:
                       settings.setMediaPlaybackRequiresUserGesture(false);
                       settings.setDomStorageEnabled(true);
                       settings.setAllowFileAccess(true);
+
+                      // Enable native audio/microphone permission bridge for web media recorder
+                      this.bridge.getWebView().setWebChromeClient(new WebChromeClient() {
+                          @Override
+                          public void onPermissionRequest(final PermissionRequest request) {
+                              runOnUiThread(() -> request.grant(request.getResources()));
+                          }
+                      });
                   }
               }
           }
           EOF
 
-          # Add standard background & notification permissions to AndroidManifest.xml
+          # Add standard audio, background & notification permissions to AndroidManifest.xml
           MANIFEST_PATH="android/app/src/main/AndroidManifest.xml"
-          sed -i '/<application/i \    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n    <uses-permission android:name="android.permission.WAKE_LOCK" />' $MANIFEST_PATH
+          sed -i '/<application/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n    <uses-permission android:name="android.permission.WAKE_LOCK" />' $MANIFEST_PATH
 
       - name: 8. Sync Capacitor Assets
         run: npx cap sync android
