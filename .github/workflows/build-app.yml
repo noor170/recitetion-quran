@@ -45,7 +45,7 @@ jobs:
 
       - name: 7. Enable Autoplay, Recording & Permissions in Android Source
         run: |
-          # Configure MainActivity to support autoplay and grant Web Chrome media/microphone requests
+          # Configure MainActivity to support autoplay and auto-grant Web Chrome media/microphone requests
           MAIN_ACTIVITY_PATH="android/app/src/main/java/com/dhaka/azan/MainActivity.java"
           cat << 'EOF' > $MAIN_ACTIVITY_PATH
           package com.dhaka.azan;
