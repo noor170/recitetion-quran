@@ -3,335 +3,434 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Surah Al-Ikhlas (سورة الإخلاص)</title>
+  <title>Surah Al-Ikhlas | سورة الإخلاص</title>
+  
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <!-- Lightweight MP3 Encoder Library -->
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- MP3 Encoder -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
+
   <style>
     :root {
-      --primary-color: #0f5132;
-      --secondary-color: #0d6efd;
-      --record-color: #dc3545;
-      --full-play-color: #6f42c1;
-      --download-color: #198754;
-      --bg-color: #f8f9fa;
-      --card-bg: #ffffff;
-      --text-color: #212529;
-      --border-color: #dee2e6;
+      --primary: #0d9488;
+      --primary-hover: #0f766e;
+      --primary-light: #f0fdf4;
+      --accent: #d97706;
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --success: #10b981;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 14px rgba(0,0,0,0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      margin: 0;
-      padding: 2rem 1rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      padding: 1.5rem 1rem 3rem;
       display: flex;
       justify-content: center;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .container {
-      max-width: 1100px;
+    .app-card {
       width: 100%;
-      background-color: var(--card-bg);
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      max-width: 720px;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
     }
 
+    /* Header Section */
     .header {
-      text-align: center;
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 2px solid var(--border-color);
-    }
-
-    .header h1 {
-      margin: 0 0 0.5rem 0;
-      color: var(--primary-color);
-      font-size: 1.8rem;
-    }
-
-    .header p {
-      margin: 0;
-      color: #6c757d;
-      font-size: 0.95rem;
-    }
-
-    .bismillah {
-      font-family: 'Amiri', serif;
-      font-size: 1.8rem;
-      text-align: center;
-      margin-bottom: 1.5rem;
-      color: var(--primary-color);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-
-    th, td {
-      padding: 1rem;
-      border-bottom: 1px solid var(--border-color);
-      vertical-align: middle;
-    }
-
-    th {
-      background-color: #f1f3f5;
-      color: var(--primary-color);
-      font-weight: 600;
-      text-align: left;
-    }
-
-    th.arabic-col, td.arabic-col {
-      text-align: right;
-    }
-
-    .verse-num {
-      width: 6%;
-      text-align: center;
-      font-weight: bold;
-      color: var(--primary-color);
-    }
-
-    .arabic-text {
-      font-family: 'Amiri', serif;
-      font-size: 1.6rem;
-      direction: rtl;
-      line-height: 1.8;
-    }
-
-    .transliteration {
-      font-style: italic;
-      color: #495057;
-    }
-
-    .translation {
-      color: var(--text-color);
-    }
-
-    .action-col, .tilawat-col {
-      width: 15%;
-      text-align: center;
-    }
-
-    /* Common button styles */
-    .btn {
-      color: #ffffff;
-      border: none;
-      padding: 0.5rem 0.8rem;
-      font-size: 0.85rem;
-      font-weight: 600;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.3rem;
-      min-width: 95px;
-    }
-
-    /* Record button states */
-    .rec-btn {
-      background-color: var(--primary-color);
-    }
-
-    .rec-btn:hover {
-      background-color: #0b3d26;
-    }
-
-    .rec-btn.recording {
-      background-color: var(--record-color);
-      animation: pulse 1.5s infinite;
-    }
-
-    .rec-btn.has-recording {
-      background-color: #198754;
-    }
-
-    /* Tilawat button styling */
-    .tilawat-btn {
-      background-color: var(--secondary-color);
-    }
-
-    .tilawat-btn:hover {
-      background-color: #0b5ed7;
-    }
-
-    .btn:active {
-      transform: scale(0.98);
-    }
-
-    /* Full Surah Control Section */
-    .full-surah-container {
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 2px dashed var(--border-color);
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.35rem 0.85rem;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .header h1 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .bismillah {
+      font-family: 'Amiri Quran', serif;
+      font-size: 1.9rem;
+      color: var(--primary);
+      text-align: center;
+      line-height: 2.2;
+      background: linear-gradient(180deg, #115e59 0%, var(--primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-top: 0.5rem;
+    }
+
+    /* Verse Cards Container */
+    .verse-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .verse-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      background: var(--surface);
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
       gap: 1rem;
     }
 
-    .button-group {
+    .verse-card:hover {
+      border-color: #cbd5e1;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .verse-header {
       display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .verse-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
       justify-content: center;
     }
 
-    .full-play-btn {
-      background-color: var(--full-play-color);
+    .arabic-text {
+      font-family: 'Amiri Quran', serif;
+      font-size: 1.65rem;
+      direction: rtl;
+      text-align: right;
+      color: #0f172a;
+      line-height: 2;
+    }
+
+    .translation-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .transliteration {
       font-size: 0.95rem;
-      padding: 0.7rem 1.2rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .translation {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .controls-row {
+      display: flex;
+      gap: 0.75rem;
+      padding-top: 0.5rem;
+      border-top: 1px dashed var(--border);
+    }
+
+    /* Buttons */
+    .btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
       border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .full-play-btn:hover {
-      background-color: #59359a;
+    .btn-secondary {
+      background-color: #f1f5f9;
+      color: var(--text-main);
     }
 
-    .save-mp3-btn {
-      background-color: var(--download-color);
-      font-size: 0.95rem;
-      padding: 0.7rem 1.2rem;
-      border-radius: 8px;
+    .btn-secondary:hover {
+      background-color: #e2e8f0;
     }
 
-    .save-mp3-btn:hover {
-      background-color: #146c43;
+    .btn-record {
+      background-color: var(--primary);
+      color: #ffffff;
     }
 
-    .full-play-btn:disabled, .save-mp3-btn:disabled {
-      background-color: #6c757d;
+    .btn-record:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-record.recording {
+      background-color: var(--danger);
+      animation: pulse-red 1.5s infinite;
+    }
+
+    .btn-record.has-recording {
+      background-color: var(--success);
+    }
+
+    /* Global Actions Footer */
+    .actions-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      background: #f8fafc;
+      padding: 1.25rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    .btn-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .btn-primary {
+      background-color: #3b82f6;
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: #2563eb;
+    }
+
+    .btn-export {
+      background-color: #059669;
+      color: white;
+    }
+
+    .btn-export:hover:not(:disabled) {
+      background-color: #047857;
+    }
+
+    .btn-clear {
+      background-color: #64748b;
+      color: white;
+    }
+
+    .btn-clear:hover {
+      background-color: #475569;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
       cursor: not-allowed;
-      opacity: 0.65;
     }
 
-    .status-msg {
-      font-size: 0.88rem;
-      color: #6c757d;
+    .status-badge {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
     }
 
-    @keyframes pulse {
-      0% { opacity: 1; }
-      50% { opacity: 0.6; }
-      100% { opacity: 1; }
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background-color: #1e293b;
+      color: white;
+      padding: 0.75rem 1.25rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 9999;
     }
 
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-      .container {
-        padding: 1rem;
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @keyframes pulse-red {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 0.75rem 0.5rem;
       }
-      th, td {
-        padding: 0.75rem 0.4rem;
+      .app-card {
+        padding: 1.25rem 1rem;
       }
-      .arabic-text {
-        font-size: 1.2rem;
-      }
-      .btn {
-        padding: 0.4rem 0.5rem;
-        font-size: 0.75rem;
-        min-width: 80px;
+      .controls-row {
+        flex-direction: column;
       }
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <div class="header">
-      <h1>Surah Al-Ikhlas (سورة الإخلاص)</h1>
-      <p>Chapter 112 • The Sincerity / The Purity</p>
-    </div>
+  <div class="app-card">
+    <!-- Header -->
+    <header class="header">
+      <span class="badge">Chapter 112 • Al-Ikhlas</span>
+      <h1>Surah Al-Ikhlas</h1>
+      <div class="bismillah">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
+    </header>
 
-    <div class="bismillah">
-      بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
-    </div>
+    <!-- Verses Container -->
+    <main class="verse-list">
 
-    <table>
-      <thead>
-        <tr>
-          <th class="verse-num">#</th>
-          <th class="arabic-col">Arabic</th>
-          <th>Transliteration</th>
-          <th>English Translation</th>
-          <th class="action-col">Record Voice</th>
-          <th class="tilawat-col">Tilawat</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="verse-num">1</td>
-          <td class="arabic-col arabic-text">قُلْ هُوَ اللَّهُ أَحَدٌ</td>
-          <td class="transliteration">Qul huwal-laahu ahad</td>
-          <td class="translation">Say, "He is Allah, [who is] One,"</td>
-          <td class="action-col">
-            <button class="btn rec-btn" onclick="toggleRecord(1, this)">🎤 Record</button>
-          </td>
-          <td class="tilawat-col">
-            <button class="btn tilawat-btn" onclick="playAudio('https://cdn.islamic.network/quran/audio/128/ar.alafasy/6222.mp3')">▶ Play</button>
-          </td>
-        </tr>
-        <tr>
-          <td class="verse-num">2</td>
-          <td class="arabic-col arabic-text">اللَّهُ الصَّمَدُ</td>
-          <td class="transliteration">Allahus-samad</td>
-          <td class="translation">"Allah, the Eternal Refuge."</td>
-          <td class="action-col">
-            <button class="btn rec-btn" onclick="toggleRecord(2, this)">🎤 Record</button>
-          </td>
-          <td class="tilawat-col">
-            <button class="btn tilawat-btn" onclick="playAudio('https://cdn.islamic.network/quran/audio/128/ar.alafasy/6223.mp3')">▶ Play</button>
-          </td>
-        </tr>
-        <tr>
-          <td class="verse-num">3</td>
-          <td class="arabic-col arabic-text">لَمْ يَلِدْ وَلَمْ يُولَدْ</td>
-          <td class="transliteration">Lam yalid wa lam yoolad</td>
-          <td class="translation">"He neither begets nor is born,"</td>
-          <td class="action-col">
-            <button class="btn rec-btn" onclick="toggleRecord(3, this)">🎤 Record</button>
-          </td>
-          <td class="tilawat-col">
-            <button class="btn tilawat-btn" onclick="playAudio('https://cdn.islamic.network/quran/audio/128/ar.alafasy/6224.mp3')">▶ Play</button>
-          </td>
-        </tr>
-        <tr>
-          <td class="verse-num">4</td>
-          <td class="arabic-col arabic-text">وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ</td>
-          <td class="transliteration">Wa lam yakul-lahu kufuwan ahad</td>
-          <td class="translation">"Nor is there to Him any equivalent."</td>
-          <td class="action-col">
-            <button class="btn rec-btn" onclick="toggleRecord(4, this)">🎤 Record</button>
-          </td>
-          <td class="tilawat-col">
-            <button class="btn tilawat-btn" onclick="playAudio('https://cdn.islamic.network/quran/audio/128/ar.alafasy/6225.mp3')">▶ Play</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      <!-- Verse 1 -->
+      <article class="verse-card">
+        <div class="verse-header">
+          <span class="verse-badge">1</span>
+          <div class="arabic-text">قُلْ هُوَ اللَّهُ أَحَدٌ</div>
+        </div>
+        <div class="translation-group">
+          <div class="transliteration">Qul huwal-laahu ahad</div>
+          <div class="translation">Say, "He is Allah, [who is] One,"</div>
+        </div>
+        <div class="controls-row">
+          <button class="btn btn-secondary" onclick="playAudio('https://cdn.islamic.network/quran/audio/128/ar.alafasy/6222.mp3')">
+            ▶ Reference Tilawat
+          </button>
+          <button id="rec-btn-1" class="btn btn-record" onclick="toggleRecord(1, this)">
+            🎙 Record Voice
+          </button>
+        </div>
+      </article>
 
-    <!-- Full Surah Control Section -->
-    <div class="full-surah-container">
-      <div class="button-group">
-        <button id="fullPlayBtn" class="btn full-play-btn" disabled onclick="playFullSurah()">
-          ▶ Play Full Surah Recitation
+      <!-- Verse 2 -->
+      <article class="verse-card">
+        <div class="verse-header">
+          <span class="verse-badge">2</span>
+          <div class="arabic-text">اللَّهُ الصَّمَدُ</div>
+        </div>
+        <div class="translation-group">
+          <div class="transliteration">Allahus-samad</div>
+          <div class="translation">"Allah, the Eternal Refuge."</div>
+        </div>
+        <div class="controls-row">
+          <button class="btn btn-secondary" onclick="playAudio('https://cdn.islamic.network/quran/audio/128/ar.alafasy/6223.mp3')">
+            ▶ Reference Tilawat
+          </button>
+          <button id="rec-btn-2" class="btn btn-record" onclick="toggleRecord(2, this)">
+            🎙 Record Voice
+          </button>
+        </div>
+      </article>
+
+      <!-- Verse 3 -->
+      <article class="verse-card">
+        <div class="verse-header">
+          <span class="verse-badge">3</span>
+          <div class="arabic-text">لَمْ يَلِدْ وَلَمْ يُولَدْ</div>
+        </div>
+        <div class="translation-group">
+          <div class="transliteration">Lam yalid wa lam yoolad</div>
+          <div class="translation">"He neither begets nor is born,"</div>
+        </div>
+        <div class="controls-row">
+          <button class="btn btn-secondary" onclick="playAudio('https://cdn.islamic.network/quran/audio/128/ar.alafasy/6224.mp3')">
+            ▶ Reference Tilawat
+          </button>
+          <button id="rec-btn-3" class="btn btn-record" onclick="toggleRecord(3, this)">
+            🎙 Record Voice
+          </button>
+        </div>
+      </article>
+
+      <!-- Verse 4 -->
+      <article class="verse-card">
+        <div class="verse-header">
+          <span class="verse-badge">4</span>
+          <div class="arabic-text">وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ</div>
+        </div>
+        <div class="translation-group">
+          <div class="transliteration">Wa lam yakul-lahu kufuwan ahad</div>
+          <div class="translation">"Nor is there to Him any equivalent."</div>
+        </div>
+        <div class="controls-row">
+          <button class="btn btn-secondary" onclick="playAudio('https://cdn.islamic.network/quran/audio/128/ar.alafasy/6225.mp3')">
+            ▶ Reference Tilawat
+          </button>
+          <button id="rec-btn-4" class="btn btn-record" onclick="toggleRecord(4, this)">
+            🎙 Record Voice
+          </button>
+        </div>
+      </article>
+
+    </main>
+
+    <!-- Global Controls -->
+    <footer class="actions-footer">
+      <div class="btn-group">
+        <button id="fullPlayBtn" class="btn btn-primary" disabled onclick="playFullSurah()">
+          ▶ Play Full Recitation
         </button>
-        <button id="saveMp3Btn" class="btn save-mp3-btn" disabled onclick="exportToMp3()">
-          💾 Save as MP3
+        <button id="saveMp3Btn" class="btn btn-export" disabled onclick="exportToMp3()">
+          💾 Export MP3
+        </button>
+        <button id="clearBtn" class="btn btn-clear" onclick="clearStorage()">
+          🗑 Reset Audio
         </button>
       </div>
-      <div id="statusMsg" class="status-msg">Record all 4 verses to enable full Surah playback & MP3 export.</div>
-    </div>
+      <div id="statusMsg" class="status-badge">Record all 4 verses to enable full recitation & MP3 export.</div>
+    </footer>
   </div>
+
+  <!-- Toast Notification System -->
+  <div id="toast" class="toast"></div>
 
   <script>
     let currentAudio = null;
@@ -341,9 +440,95 @@
     
     let recordedBlobs = {};
     let recordedUrls = {};
-    let finalMp3Blob = null; // Stores converted MP3 in memory
+    let db = null;
 
-    // Play individual audio
+    // Custom UI Toast Notification
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    // --- INDEXEDDB SETUP FOR PERSISTENT STORAGE ---
+    function initDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open('SurahAudioDB', 1);
+        
+        request.onupgradeneeded = event => {
+          const db = event.target.result;
+          if (!db.objectStoreNames.contains('recordings')) {
+            db.createObjectStore('recordings');
+          }
+        };
+
+        request.onsuccess = event => {
+          db = event.target.result;
+          loadRecordingsFromDB();
+          resolve(db);
+        };
+
+        request.onerror = event => {
+          console.error('IndexedDB error:', event.target.error);
+          reject(event.target.error);
+        };
+      });
+    }
+
+    function saveBlobToDB(verseNum, blob) {
+      if (!db) return;
+      const transaction = db.transaction(['recordings'], 'readwrite');
+      const store = transaction.objectStore('recordings');
+      store.put(blob, verseNum);
+    }
+
+    function loadRecordingsFromDB() {
+      if (!db) return;
+      const transaction = db.transaction(['recordings'], 'readonly');
+      const store = transaction.objectStore('recordings');
+
+      for (let verseNum = 1; verseNum <= 4; verseNum++) {
+        const request = store.get(verseNum);
+        request.onsuccess = event => {
+          const blob = event.target.result;
+          if (blob) {
+            recordedBlobs[verseNum] = blob;
+            recordedUrls[verseNum] = URL.createObjectURL(blob);
+
+            const btn = document.getElementById(`rec-btn-${verseNum}`);
+            if (btn) {
+              btn.innerHTML = '🔊 Listen Back';
+              btn.classList.add('has-recording');
+            }
+            checkFullSurahReady();
+          }
+        };
+      }
+    }
+
+    function clearStorage() {
+      if (!db) return;
+      const transaction = db.transaction(['recordings'], 'readwrite');
+      const store = transaction.objectStore('recordings');
+      store.clear();
+
+      recordedBlobs = {};
+      recordedUrls = {};
+
+      for (let verseNum = 1; verseNum <= 4; verseNum++) {
+        const btn = document.getElementById(`rec-btn-${verseNum}`);
+        if (btn) {
+          btn.innerHTML = '🎙 Record Voice';
+          btn.classList.remove('has-recording', 'recording');
+        }
+      }
+
+      checkFullSurahReady();
+      showToast('All recorded audio has been reset.');
+    }
+
+    window.addEventListener('DOMContentLoaded', initDB);
+
     function playAudio(url) {
       if (currentAudio) {
         currentAudio.pause();
@@ -352,18 +537,21 @@
       currentAudio.play();
     }
 
-    // Toggle Record / Stop / Play Recording
+    // --- TOGGLE RECORD WITH DETAILED PERMISSION HANDLER ---
     async function toggleRecord(verseNum, btn) {
+      // Stop ongoing recording
       if (recordingVerse === verseNum && mediaRecorder && mediaRecorder.state === "recording") {
         mediaRecorder.stop();
         return;
       }
 
+      // Play existing recording
       if (recordedUrls[verseNum] && !btn.classList.contains('recording')) {
         playAudio(recordedUrls[verseNum]);
         return;
       }
 
+      // Request microphone stream with try-catch
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(stream);
@@ -378,7 +566,9 @@
           recordedBlobs[verseNum] = audioBlob;
           recordedUrls[verseNum] = URL.createObjectURL(audioBlob);
           
-          btn.textContent = '🔊 Listen';
+          saveBlobToDB(verseNum, audioBlob);
+
+          btn.innerHTML = '🔊 Listen Back';
           btn.classList.remove('recording');
           btn.classList.add('has-recording');
           recordingVerse = null;
@@ -389,16 +579,19 @@
 
         mediaRecorder.start();
         recordingVerse = verseNum;
-        btn.textContent = '⏹ Stop';
+        btn.innerHTML = '⏹ Stop Recording';
         btn.classList.add('recording');
 
       } catch (err) {
-        alert('Microphone access is required to record your recitation.');
-        console.error('Microphone error:', err);
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          showToast('Microphone permission was denied. Please allow microphone access in device settings.');
+        } else {
+          showToast('Microphone error: ' + err.message);
+        }
+        console.error('Audio recording failure:', err);
       }
     }
 
-    // Check if all 4 verses are recorded
     function checkFullSurahReady() {
       const fullPlayBtn = document.getElementById('fullPlayBtn');
       const saveMp3Btn = document.getElementById('saveMp3Btn');
@@ -409,16 +602,15 @@
         fullPlayBtn.disabled = false;
         saveMp3Btn.disabled = false;
         statusMsg.textContent = 'All 4 verses recorded! Ready for full playback and MP3 export.';
-        statusMsg.style.color = '#198754';
+        statusMsg.style.color = 'var(--success)';
       } else {
         fullPlayBtn.disabled = true;
         saveMp3Btn.disabled = true;
         statusMsg.textContent = `Recorded (${recordedCount}/4) verses. Record remaining verses to enable export.`;
-        statusMsg.style.color = '#6c757d';
+        statusMsg.style.color = 'var(--text-muted)';
       }
     }
 
-    // Sequential Audio Playback
     function playFullSurah() {
       if (Object.keys(recordedBlobs).length < 4) return;
 
@@ -431,12 +623,12 @@
 
       function playNextVerse() {
         if (currentVerseIndex > 4) {
-          fullPlayBtn.textContent = '▶ Play Full Surah Recitation';
+          fullPlayBtn.innerHTML = '▶ Play Full Recitation';
           checkFullSurahReady();
           return;
         }
 
-        fullPlayBtn.textContent = `⏸ Playing Verse ${currentVerseIndex} of 4...`;
+        fullPlayBtn.innerHTML = `⏸ Playing Verse ${currentVerseIndex}...`;
         currentAudio = new Audio(recordedUrls[currentVerseIndex]);
         currentAudio.play();
 
@@ -449,26 +641,23 @@
       playNextVerse();
     }
 
-    // Convert Recorded WebM Audio Blobs to MP3 Format via Web Audio API & lamejs
     async function exportToMp3() {
       if (Object.keys(recordedBlobs).length < 4) return;
 
       const statusMsg = document.getElementById('statusMsg');
-      statusMsg.textContent = 'Processing and encoding audio to MP3 format...';
-      statusMsg.style.color = '#0d6efd';
+      statusMsg.textContent = 'Encoding full Surah to MP3 format...';
+      statusMsg.style.color = 'var(--primary)';
 
       try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         let audioBuffers = [];
 
-        // Decode each verse blob into AudioBuffer
         for (let i = 1; i <= 4; i++) {
           const arrayBuffer = await recordedBlobs[i].arrayBuffer();
           const decodedData = await audioCtx.decodeAudioData(arrayBuffer);
           audioBuffers.push(decodedData);
         }
 
-        // Calculate total length and merge audio channels
         const totalLength = audioBuffers.reduce((acc, buf) => acc + buf.length, 0);
         const mergedBuffer = audioCtx.createBuffer(1, totalLength, audioCtx.sampleRate);
         const channelData = mergedBuffer.getChannelData(0);
@@ -479,7 +668,6 @@
           offset += buf.length;
         }
 
-        // Encode Float32 PCM to Int16 PCM and convert using lamejs
         const sampleRate = mergedBuffer.sampleRate;
         const pcmSamples = new Int16Array(channelData.length);
         for (let i = 0; i < channelData.length; i++) {
@@ -504,10 +692,9 @@
           mp3Data.push(mp3end);
         }
 
-        // Create stored MP3 Blob in application memory
-        finalMp3Blob = new Blob(mp3Data, { type: 'audio/mp3' });
+        const finalMp3Blob = new Blob(mp3Data, { type: 'audio/mp3' });
+        saveBlobToDB('fullSurahMp3', finalMp3Blob);
         
-        // Trigger browser download
         const downloadLink = document.createElement('a');
         downloadLink.href = URL.createObjectURL(finalMp3Blob);
         downloadLink.download = 'Surah_Al_Ikhlas_Recitation.mp3';
@@ -515,13 +702,12 @@
         downloadLink.click();
         document.body.removeChild(downloadLink);
 
-        statusMsg.textContent = 'Surah successfully exported and saved as MP3!';
-        statusMsg.style.color = '#198754';
+        showToast('MP3 downloaded successfully!');
+        checkFullSurahReady();
 
       } catch (err) {
         console.error('Encoding error:', err);
-        statusMsg.textContent = 'Error encoding audio to MP3. Please re-record and try again.';
-        statusMsg.style.color = '#dc3545';
+        showToast('Encoding failed. Please try re-recording.');
       }
     }
   </script>
