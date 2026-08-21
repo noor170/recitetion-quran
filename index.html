@@ -627,10 +627,10 @@
       </div>
 
       <div class="badge-group">
-        <span class="badge">Chapter 112 • Al-Ikhlas</span>
+        <span id="surahBadge" class="badge">Chapter 112 • Al-Ikhlas</span>
         <span id="appModeBadge" class="badge badge-mode">Practice Mode</span>
       </div>
-      <h1>Surah Al-Ikhlas</h1>
+      <h1 id="surahTitle">Surah Al-Ikhlas</h1>
       <div class="bismillah">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
     </header>
 
@@ -646,6 +646,13 @@
           <option value="practice">Practice Mode (Listen & Record Verse-by-Verse)</option>
           <option value="listen">Listen Only Mode</option>
           <option value="record">Record Only Mode (Studio Full Recitation)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="surahSelect">Select Surah:</label>
+        <select id="surahSelect" class="qari-select" onchange="loadSurahData(this.value)">
+          <option value="112">Loading Surahs...</option>
         </select>
       </div>
 
@@ -680,133 +687,7 @@
     </section>
 
     <main class="verse-list">
-      <!-- Verse 1 -->
-      <article class="verse-card">
-        <div class="verse-header">
-          <span class="verse-badge">1</span>
-          <div class="arabic-text">قُلْ هُوَ اللَّهُ أَحَدٌ</div>
-        </div>
-        <div class="translation-group">
-          <div class="transliteration">Qul huwal-laahu ahad</div>
-          <div class="translation">Say, "He is Allah, [who is] One,"</div>
-        </div>
-        
-        <div id="timeline-1" class="timeline-container practice-only">
-          <div class="timeline-meta">
-            <span>Visual Backtracking Timeline</span>
-            <span id="timer-badge-1">00:00 / 00:00</span>
-          </div>
-          <div class="scrubber-wrapper">
-            <canvas id="wave-canvas-1" class="waveform-canvas"></canvas>
-            <input type="range" id="scrubber-1" class="timeline-slider" value="0" min="0" max="100" step="0.1" oninput="seekRecording(1, this.value)">
-          </div>
-        </div>
-
-        <div class="controls-row">
-          <button id="ref-btn-1" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6222, this)">
-            ▶ Reference Tilawat
-          </button>
-          <button id="rec-btn-1" class="btn btn-record practice-only" onclick="toggleRecord(1, this)">
-            🎙 Record Voice
-          </button>
-        </div>
-      </article>
-
-      <!-- Verse 2 -->
-      <article class="verse-card">
-        <div class="verse-header">
-          <span class="verse-badge">2</span>
-          <div class="arabic-text">اللَّهُ الصَّمَدُ</div>
-        </div>
-        <div class="translation-group">
-          <div class="transliteration">Allahus-samad</div>
-          <div class="translation">"Allah, the Eternal Refuge."</div>
-        </div>
-
-        <div id="timeline-2" class="timeline-container practice-only">
-          <div class="timeline-meta">
-            <span>Visual Backtracking Timeline</span>
-            <span id="timer-badge-2">00:00 / 00:00</span>
-          </div>
-          <div class="scrubber-wrapper">
-            <canvas id="wave-canvas-2" class="waveform-canvas"></canvas>
-            <input type="range" id="scrubber-2" class="timeline-slider" value="0" min="0" max="100" step="0.1" oninput="seekRecording(2, this.value)">
-          </div>
-        </div>
-
-        <div class="controls-row">
-          <button id="ref-btn-2" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6223, this)">
-            ▶ Reference Tilawat
-          </button>
-          <button id="rec-btn-2" class="btn btn-record practice-only" onclick="toggleRecord(2, this)">
-            🎙 Record Voice
-          </button>
-        </div>
-      </article>
-
-      <!-- Verse 3 -->
-      <article class="verse-card">
-        <div class="verse-header">
-          <span class="verse-badge">3</span>
-          <div class="arabic-text">لَمْ يَلِدْ وَلَمْ يُولَدْ</div>
-        </div>
-        <div class="translation-group">
-          <div class="transliteration">Lam yalid wa lam yoolad</div>
-          <div class="translation">"He neither begets nor is born,"</div>
-        </div>
-
-        <div id="timeline-3" class="timeline-container practice-only">
-          <div class="timeline-meta">
-            <span>Visual Backtracking Timeline</span>
-            <span id="timer-badge-3">00:00 / 00:00</span>
-          </div>
-          <div class="scrubber-wrapper">
-            <canvas id="wave-canvas-3" class="waveform-canvas"></canvas>
-            <input type="range" id="scrubber-3" class="timeline-slider" value="0" min="0" max="100" step="0.1" oninput="seekRecording(3, this.value)">
-          </div>
-        </div>
-
-        <div class="controls-row">
-          <button id="ref-btn-3" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6224, this)">
-            ▶ Reference Tilawat
-          </button>
-          <button id="rec-btn-3" class="btn btn-record practice-only" onclick="toggleRecord(3, this)">
-            🎙 Record Voice
-          </button>
-        </div>
-      </article>
-
-      <!-- Verse 4 -->
-      <article class="verse-card">
-        <div class="verse-header">
-          <span class="verse-badge">4</span>
-          <div class="arabic-text">وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ</div>
-        </div>
-        <div class="translation-group">
-          <div class="transliteration">Wa lam yakul-lahu kufuwan ahad</div>
-          <div class="translation">"Nor is there to Him any equivalent."</div>
-        </div>
-
-        <div id="timeline-4" class="timeline-container practice-only">
-          <div class="timeline-meta">
-            <span>Visual Backtracking Timeline</span>
-            <span id="timer-badge-4">00:00 / 00:00</span>
-          </div>
-          <div class="scrubber-wrapper">
-            <canvas id="wave-canvas-4" class="waveform-canvas"></canvas>
-            <input type="range" id="scrubber-4" class="timeline-slider" value="0" min="0" max="100" step="0.1" oninput="seekRecording(4, this.value)">
-          </div>
-        </div>
-
-        <div class="controls-row">
-          <button id="ref-btn-4" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6225, this)">
-            ▶ Reference Tilawat
-          </button>
-          <button id="rec-btn-4" class="btn btn-record practice-only" onclick="toggleRecord(4, this)">
-            🎙 Record Voice
-          </button>
-        </div>
-      </article>
+      <!-- Verse cards injected dynamically via JS -->
     </main>
 
     <footer class="actions-footer practice-only">
@@ -877,8 +758,14 @@
 
     let recordedBlobs = {};
     let recordedUrls = {};
-    let referenceDurations = {}; // Store duration for each reference verse
     let db = null;
+
+    let currentSurah = 112;
+    let totalVerses = 4;
+    let verseAudioUrls = {};
+    let verseArabic = {};
+    let verseTranslation = {};
+    const recKey = (v) => `${currentSurah}_${v}`;
 
     let studioAudioCtx = null;
     let studioAnalyser = null;
@@ -887,8 +774,6 @@
     let studioStartTime = 0;
     let studioMasterBlob = null;
     let visualizerFrame = null;
-
-    const verseIds = [6222, 6223, 6224, 6225];
 
     function setAutoplay(enabled) {
       isAutoplayEnabled = enabled;
@@ -933,6 +818,7 @@
       activeQariIdentifier = select.value;
       const selectedName = select.options[select.selectedIndex].text;
       document.getElementById('activeQariLabel').textContent = selectedName;
+      loadSurahData(currentSurah);
     }
 
     function showToast(message) {
@@ -971,7 +857,7 @@
           fullPlayBtn.classList.remove('playing');
         }
 
-        for (let i = 1; i <= 4; i++) {
+        for (let i = 1; i <= totalVerses; i++) {
           const refBtn = document.getElementById(`ref-btn-${i}`);
           if (refBtn) refBtn.innerHTML = '▶ Reference Tilawat';
 
@@ -1000,7 +886,6 @@
 
         request.onsuccess = event => {
           db = event.target.result;
-          loadRecordingsFromDB();
           resolve(db);
         };
         request.onerror = event => reject(event.target.error);
@@ -1018,15 +903,16 @@
       const transaction = db.transaction(['recordings'], 'readonly');
       const store = transaction.objectStore('recordings');
 
-      for (let verseNum = 1; verseNum <= 4; verseNum++) {
-        const request = store.get(verseNum);
+      for (let verseNum = 1; verseNum <= totalVerses; verseNum++) {
+        const request = store.get(recKey(verseNum));
         request.onsuccess = event => {
           const blob = event.target.result;
           if (blob) {
             recordedBlobs[verseNum] = blob;
             recordedUrls[verseNum] = URL.createObjectURL(blob);
 
-            document.getElementById(`timeline-${verseNum}`).classList.add('active');
+            const tl = document.getElementById(`timeline-${verseNum}`);
+            if (tl) tl.classList.add('active');
             drawStaticWaveform(verseNum, blob);
 
             const btn = document.getElementById(`rec-btn-${verseNum}`);
@@ -1060,7 +946,7 @@
       recordedBlobs = {};
       recordedUrls = {};
 
-      for (let verseNum = 1; verseNum <= 4; verseNum++) {
+      for (let verseNum = 1; verseNum <= totalVerses; verseNum++) {
         const btn = document.getElementById(`rec-btn-${verseNum}`);
         if (btn) {
           btn.innerHTML = '🎙 Record Voice';
@@ -1075,18 +961,129 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      initDB();
       const autoSwitch = document.getElementById('autoplaySwitch');
       if (autoSwitch) autoSwitch.checked = isAutoplayEnabled;
+      initDB().then(async () => {
+        try {
+          await populateSurahList();
+        } catch (e) { /* toast already shown */ }
+        await loadSurahData(currentSurah);
+      });
     });
 
-    function getQariUrl(verseId) {
-      return `https://cdn.islamic.network/quran/audio/128/${activeQariIdentifier}/${verseId}.mp3`;
+    async function populateSurahList() {
+      const select = document.getElementById('surahSelect');
+      if (!select) return;
+      try {
+        const res = await fetch('https://api.alquran.cloud/v1/surah');
+        if (!res.ok) throw new Error('Failed to load Surah list');
+        const data = await res.json();
+        select.innerHTML = '';
+        data.data.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.number;
+          opt.textContent = `${s.number}. ${s.englishName} (${s.name})`;
+          select.appendChild(opt);
+        });
+        select.value = currentSurah;
+      } catch (err) {
+        showToast('Failed to load Surah list. Please check your connection.');
+      }
     }
 
-    function playSingleVerseQiraat(verseId, btn) {
-      const stateKey = `ref-${verseId}`;
-      const verseNum = verseIds.indexOf(verseId) + 1;
+    async function loadSurahData(surahNumber) {
+      stopAllPlayback(true);
+      const select = document.getElementById('surahSelect');
+      if (select) select.value = surahNumber;
+
+      try {
+        const url = `https://api.alquran.cloud/v1/surah/${surahNumber}/editions/quran-uthmani,en.sahih,${activeQariIdentifier}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Failed to load Surah data');
+        const data = await res.json();
+        const editions = data.data; // [uthmani, en.sahih, audio]
+        const uthmani = editions[0];
+        const translation = editions[1];
+        const audio = editions[2];
+
+        currentSurah = parseInt(surahNumber, 10);
+        totalVerses = uthmani.numberOfAyahs;
+        verseAudioUrls = {};
+        verseArabic = {};
+        verseTranslation = {};
+
+        uthmani.ayahs.forEach((ayah, idx) => {
+          const v = ayah.numberInSurah;
+          verseArabic[v] = ayah.text;
+          verseTranslation[v] = translation.ayahs[idx].text;
+          verseAudioUrls[v] = audio.ayahs[idx].audio;
+        });
+
+        // Reset in-memory recordings for the newly loaded Surah
+        recordedBlobs = {};
+        recordedUrls = {};
+
+        renderVerseCards();
+        updateSurahHeader(uthmani);
+        loadRecordingsFromDB();
+
+        showToast(`Loaded Surah ${currentSurah}`);
+      } catch (err) {
+        showToast('Failed to load Surah. Please check your connection.');
+      }
+    }
+
+    function renderVerseCards() {
+      const container = document.querySelector('.verse-list');
+      if (!container) return;
+
+      let html = '';
+      for (let v = 1; v <= totalVerses; v++) {
+        html += `
+      <article class="verse-card">
+        <div class="verse-header">
+          <span class="verse-badge">${v}</span>
+          <div class="arabic-text">${verseArabic[v]}</div>
+        </div>
+        <div class="translation-group">
+          <div class="translation">${verseTranslation[v]}</div>
+        </div>
+
+        <div id="timeline-${v}" class="timeline-container practice-only">
+          <div class="timeline-meta">
+            <span>Visual Backtracking Timeline</span>
+            <span id="timer-badge-${v}">00:00 / 00:00</span>
+          </div>
+          <div class="scrubber-wrapper">
+            <canvas id="wave-canvas-${v}" class="waveform-canvas"></canvas>
+            <input type="range" id="scrubber-${v}" class="timeline-slider" value="0" min="0" max="100" step="0.1" oninput="seekRecording(${v}, this.value)">
+          </div>
+        </div>
+
+        <div class="controls-row">
+          <button id="ref-btn-${v}" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(${v}, this)">
+            ▶ Reference Tilawat
+          </button>
+          <button id="rec-btn-${v}" class="btn btn-record practice-only" onclick="toggleRecord(${v}, this)">
+            🎙 Record Voice
+          </button>
+        </div>
+      </article>`;
+      }
+      container.innerHTML = html;
+    }
+
+    function updateSurahHeader(surahMeta) {
+      const badge = document.getElementById('surahBadge');
+      const title = document.getElementById('surahTitle');
+      if (badge) badge.textContent = `Chapter ${surahMeta.number} • ${surahMeta.englishName}`;
+      if (title) title.textContent = `Surah ${surahMeta.englishName}`;
+      document.title = `Surah ${surahMeta.englishName} | Studio Reciter & Practice App`;
+    }
+
+    function playSingleVerseQiraat(verseNum, btn) {
+      const stateKey = `ref-${verseNum}`;
+      const audioUrl = verseAudioUrls[verseNum];
 
       if (currentPlaybackState === stateKey && !isPaused && currentAudio) {
         currentAudio.pause();
@@ -1099,12 +1096,13 @@
       currentPlaybackState = stateKey;
       isPaused = false;
 
-      currentAudio = new Audio(getQariUrl(verseId));
+      currentAudio = new Audio(audioUrl);
       btn.innerHTML = '⏸ Pause Tilawat';
 
-      // Store duration when audio metadata is loaded
       currentAudio.onloadedmetadata = () => {
-        referenceDurations[verseNum] = currentAudio.duration;
+        if (currentAudio.duration && !isNaN(currentAudio.duration)) {
+          currentReferenceDuration = currentAudio.duration * 1000;
+        }
       };
 
       currentAudio.play();
@@ -1113,9 +1111,7 @@
         stopAllPlayback(true);
         const recBtn = document.getElementById(`rec-btn-${verseNum}`);
         if (recBtn) {
-          // Pass the reference audio duration to set the exact timer limit
-          const duration = referenceDurations[verseNum] || currentAudio.duration || 5;
-          toggleRecord(verseNum, recBtn, duration);
+          toggleRecord(verseNum, recBtn);
         }
       };
     }
@@ -1146,12 +1142,12 @@
       qiraatBtn.classList.add('playing');
 
       function playNext() {
-        if (currentVerseIndex >= verseIds.length || currentPlaybackState !== 'fullQiraat') {
+        if (currentVerseIndex >= totalVerses || currentPlaybackState !== 'fullQiraat') {
           stopAllPlayback(true);
           return;
         }
 
-        const url = getQariUrl(verseIds[currentVerseIndex]);
+        const url = verseAudioUrls[currentVerseIndex + 1];
         qiraatBtn.innerHTML = `⏸ Pause Qira'at (Verse ${currentVerseIndex + 1})`;
         currentAudio = new Audio(url);
         currentAudio.play();
@@ -1209,7 +1205,7 @@
           const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
           recordedBlobs[verseNum] = audioBlob;
           recordedUrls[verseNum] = URL.createObjectURL(audioBlob);
-          saveBlobToDB(verseNum, audioBlob);
+          saveBlobToDB(recKey(verseNum), audioBlob);
 
           document.getElementById(`timeline-${verseNum}`).classList.add('active');
           drawStaticWaveform(verseNum, audioBlob);
@@ -1294,14 +1290,14 @@
 
     // 3. Reference Tilawat Player (Captures Exact Duration)
     function playReferenceVerse(verseNum, onCompleteCallback) {
-      const verseId = verseIds[verseNum - 1];
+      const audioUrl = verseAudioUrls[verseNum];
       stopAllPlayback(true);
-      currentPlaybackState = `ref-${verseId}`;
+      currentPlaybackState = `ref-${verseNum}`;
 
       const btn = document.getElementById(`ref-btn-${verseNum}`);
       if (btn) btn.innerHTML = '⏸ Reference Tilawat';
 
-      currentAudio = new Audio(getQariUrl(verseId));
+      currentAudio = new Audio(audioUrl);
 
       // Capture audio metadata to determine exact recording duration
       currentAudio.onloadedmetadata = () => {
@@ -1323,7 +1319,7 @@
       if (!isAutoplayEnabled) return;
 
       // Phase 1 (Learn & Record): Reference -> Auto-Record -> Next
-      if (!isReviewingPhase && currentAutoplayVerse <= 4) {
+      if (!isReviewingPhase && currentAutoplayVerse <= totalVerses) {
         playReferenceVerse(currentAutoplayVerse, () => {
           const recBtn = document.getElementById(`rec-btn-${currentAutoplayVerse}`);
           toggleRecord(currentAutoplayVerse, recBtn);
@@ -1332,7 +1328,7 @@
       }
 
       // Phase 1 Transition: Full Combined Recitation -> Transition to Phase 2
-      if (!isReviewingPhase && currentAutoplayVerse > 4) {
+      if (!isReviewingPhase && currentAutoplayVerse > totalVerses) {
         isReviewingPhase = true;
         showToast('Phase 1 Complete! Playing full combined recitation...');
         toggleFullSurah();
@@ -1345,7 +1341,7 @@
       }
 
       // Phase 2 (Review Cycle): Reference -> Play Voice -> Next
-      if (isReviewingPhase && currentAutoplayVerse <= 4) {
+      if (isReviewingPhase && currentAutoplayVerse <= totalVerses) {
         const vNum = currentAutoplayVerse;
         playReferenceVerse(vNum, () => {
           playRecordedVoice(vNum, () => {
@@ -1357,7 +1353,7 @@
       }
 
       // Phase 2 Completion: Final Full Recitation
-      if (isReviewingPhase && currentAutoplayVerse > 4) {
+      if (isReviewingPhase && currentAutoplayVerse > totalVerses) {
         showToast('Review Cycle Complete! Playing final full recitation...');
         toggleFullSurah();
       }
@@ -1433,10 +1429,10 @@
       const statusMsg = document.getElementById('statusMsg');
       const count = Object.keys(recordedBlobs).length;
 
-      if (count === 4) {
+      if (count === totalVerses) {
         fullPlayBtn.disabled = false;
         saveMp3Btn.disabled = false;
-        statusMsg.textContent = 'All 4 verses recorded! Ready for full playback & export.';
+        statusMsg.textContent = `All ${totalVerses} verses recorded! Ready for full playback & export.`;
         statusMsg.style.color = '#2dd4bf';
 
         if (isAutoplayEnabled && currentPlaybackState !== 'fullPersonal') {
@@ -1448,12 +1444,12 @@
       } else {
         fullPlayBtn.disabled = true;
         saveMp3Btn.disabled = true;
-        statusMsg.textContent = `Recorded (${count}/4) verses. Record all to export.`;
+        statusMsg.textContent = `Recorded (${count}/${totalVerses}) verses. Record all to export.`;
       }
     }
 
     function toggleFullSurah() {
-      if (Object.keys(recordedBlobs).length < 4) return;
+      if (Object.keys(recordedBlobs).length < totalVerses) return;
       const fullPlayBtn = document.getElementById('fullPlayBtn');
 
       stopAllPlayback(true);
@@ -1462,7 +1458,7 @@
       fullPlayBtn.classList.add('playing');
 
       function playNextVerse() {
-        if (currentVerseIndex > 4 || currentPlaybackState !== 'fullPersonal') {
+        if (currentVerseIndex > totalVerses || currentPlaybackState !== 'fullPersonal') {
           stopAllPlayback(true);
           return;
         }
@@ -1633,14 +1629,14 @@
     }
 
     async function exportToMp3() {
-      if (Object.keys(recordedBlobs).length < 4) return;
+      if (Object.keys(recordedBlobs).length < totalVerses) return;
       showToast('Exporting merged MP3...');
 
       try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         let audioBuffers = [];
 
-        for (let i = 1; i <= 4; i++) {
+        for (let i = 1; i <= totalVerses; i++) {
           const arrayBuffer = await recordedBlobs[i].arrayBuffer();
           const decoded = await audioCtx.decodeAudioData(arrayBuffer);
           audioBuffers.push(decoded);
@@ -1670,7 +1666,7 @@
         const wavBlob = await bufferToWavBlob(renderedBuffer);
         const mp3Blob = await encodeBlobToMp3(wavBlob);
 
-        triggerDownload(mp3Blob, 'Surah_Al_Ikhlas_Recitation.mp3');
+        triggerDownload(mp3Blob, `Surah_${currentSurah}_Recitation.mp3`);
         showToast('MP3 export complete!');
       } catch (err) {
         showToast('Export failed.');
