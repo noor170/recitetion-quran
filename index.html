@@ -76,6 +76,37 @@
       position: relative;
     }
 
+    .header-actions {
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Autoplay Toggle Button */
+    .autoplay-btn {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: 0.4rem 0.85rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.2s ease;
+    }
+
+    .autoplay-btn.active {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: var(--success);
+      color: #34d399;
+    }
+
     .badge-group {
       display: flex;
       gap: 0.5rem;
@@ -122,19 +153,16 @@
 
     /* Settings Menu Overlay */
     .settings-btn {
-      position: absolute;
-      top: 0;
-      right: 0;
       background: var(--surface-card);
       border: 1px solid var(--border);
       border-radius: 50%;
-      width: 42px;
-      height: 42px;
+      width: 36px;
+      height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 1.2rem;
+      font-size: 1rem;
       color: var(--text-main);
       transition: all 0.2s ease;
     }
@@ -576,7 +604,13 @@
   <div class="app-card">
     <!-- Header -->
     <header class="header">
-      <button class="settings-btn" onclick="toggleSettingsMenu()" title="Settings">⚙️</button>
+      <div class="header-actions">
+        <button id="autoplayBtn" class="autoplay-btn practice-only" onclick="toggleAutoplay()">
+          <span>🔄</span> Autoplay: <strong id="autoplayStatus">OFF</strong>
+        </button>
+        <button class="settings-btn" onclick="toggleSettingsMenu()" title="Settings">⚙️</button>
+      </div>
+
       <div class="badge-group">
         <span class="badge">Chapter 112 • Al-Ikhlas</span>
         <span id="appModeBadge" class="badge badge-mode">Practice Mode</span>
@@ -781,6 +815,7 @@
     let isPaused = false;
     let currentVerseIndex = 0;
     let activeQariIdentifier = 'ar.alafasy';
+    let isAutoplayEnabled = false;
     
     let mediaRecorder = null;
     let audioChunks = [];
@@ -800,6 +835,27 @@
     let studioMasterBlob = null;
 
     const verseIds = [6222, 6223, 6224, 6225];
+
+    function toggleAutoplay() {
+      isAutoplayEnabled = !isAutoplayEnabled;
+      const btn = document.getElementById('autoplayBtn');
+      const status = document.getElementById('autoplayStatus');
+
+      if (isAutoplayEnabled) {
+        btn.classList.add('active');
+        status.textContent = 'ON';
+        showToast('Autoplay Enabled: Full recitation will auto-start when all verses are recorded.');
+        
+        // Auto trigger if ready
+        if (Object.keys(recordedBlobs).length === 4 && currentPlaybackState !== 'fullPersonal') {
+          toggleFullSurah();
+        }
+      } else {
+        btn.classList.remove('active');
+        status.textContent = 'OFF';
+        showToast('Autoplay Disabled.');
+      }
+    }
 
     function toggleSettingsMenu() {
       document.getElementById('settingsMenu').classList.toggle('active');
@@ -1156,6 +1212,10 @@
         saveMp3Btn.disabled = false;
         statusMsg.textContent = 'All 4 verses recorded! Ready for full playback & export.';
         statusMsg.style.color = '#2dd4bf';
+
+        if (isAutoplayEnabled && currentPlaybackState !== 'fullPersonal') {
+          toggleFullSurah();
+        }
       } else {
         fullPlayBtn.disabled = true;
         saveMp3Btn.disabled = true;
@@ -1218,7 +1278,6 @@
         mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
         mediaRecorder.onstop = processStudioMasterRecording;
 
-        // Sound intensity analyser using Web Audio API
         studioAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
         studioAnalyser = studioAudioCtx.createAnalyser();
         const source = studioAudioCtx.createMediaStreamSource(studioMicStream);
@@ -1256,11 +1315,9 @@
         }
         let average = sum / bufferLength;
 
-        // Reactive mic halo scaling relative to speech audio volume
         let scale = 1 + (average / 128) * 0.75;
         halo.style.transform = `scale(${scale})`;
 
-        // Render Audio Spectrum Bars
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         let barWidth = (canvas.width / bufferLength) * 2.5;
         let x = 0;
