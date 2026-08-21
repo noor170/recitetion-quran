@@ -509,6 +509,53 @@
       color: #2dd4bf;
     }
 
+    .assessment-row {
+      display: flex;
+      gap: 0.75rem;
+      padding-top: 0.25rem;
+    }
+
+    .btn-mastered {
+      background-color: var(--surface);
+      color: var(--text-muted);
+      border: 2px solid var(--border);
+    }
+
+    .btn-mastered.active {
+      background-color: rgba(16, 185, 129, 0.25);
+      border-color: var(--success);
+      color: #34d399;
+      font-weight: 800;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35);
+    }
+
+    .btn-needs {
+      background-color: var(--surface);
+      color: var(--text-muted);
+      border: 2px solid var(--border);
+    }
+
+    .btn-needs.active {
+      background-color: rgba(217, 119, 6, 0.25);
+      border-color: var(--accent);
+      color: #f59e0b;
+      font-weight: 800;
+      box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.35);
+    }
+
+    .btn-icon {
+      flex: 0 0 auto;
+      padding: 0.65rem 0.8rem;
+      min-width: 44px;
+      justify-content: center;
+    }
+
+    .btn-needs.btn-icon {
+      padding: 0.32rem 0.4rem;
+      min-width: 22px;
+      font-size: 0.7rem;
+    }
+
     .btn-record.recording {
       background-color: var(--danger);
       animation: pulse-red 1.5s infinite;
@@ -780,6 +827,7 @@
       </div>
 
       <div id="statusMsg" class="status-badge">Record all 4 verses to enable full recitation & MP3 export.</div>
+      <div id="assessmentProgress" class="status-badge">Mastered: 0/0 | Needs Practice: 0/0</div>
     </footer>
 
     <footer class="record-only" style="display: flex; flex-direction: column; gap: 1rem;">
@@ -833,6 +881,7 @@
     let countdownInterval = null;
     let loopConfig = {}; // verseNum -> { active, start, end } for A/B micro-loop rehearse
     let referencePlaybackRate = 1.0; // playback speed for reference Qari audio
+    let assessmentStatus = {}; // verseNum -> 'mastered' | 'needs_practice' | null (self-assessment)
 
     let recordedBlobs = {};
     let recordedUrls = {};
@@ -937,7 +986,7 @@
 
         for (let i = 1; i <= totalVerses; i++) {
           const refBtn = document.getElementById(`ref-btn-${i}`);
-          if (refBtn) refBtn.innerHTML = '▶ Reference Tilawat';
+          if (refBtn) refBtn.innerHTML = '▶ Tilawat';
 
           const recBtn = document.getElementById(`rec-btn-${i}`);
           if (recBtn) {
@@ -945,7 +994,7 @@
             if (recordedUrls[i]) {
               recBtn.innerHTML = '🔊 Listen Back';
             } else {
-              recBtn.innerHTML = '🎙 Record Voice';
+              recBtn.innerHTML = '🎙 Record';
             }
           }
         }
@@ -1027,7 +1076,7 @@
       for (let verseNum = 1; verseNum <= totalVerses; verseNum++) {
         const btn = document.getElementById(`rec-btn-${verseNum}`);
         if (btn) {
-          btn.innerHTML = '🎙 Record Voice';
+          btn.innerHTML = '🎙 Record';
           btn.classList.remove('has-recording', 'recording');
         }
         document.getElementById(`timeline-${verseNum}`).classList.remove('active');
@@ -1148,10 +1197,16 @@
 
         <div class="controls-row">
           <button id="ref-btn-${v}" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(${v}, this)">
-            ▶ Reference Tilawat
+            ▶ Tilawat
           </button>
           <button id="rec-btn-${v}" class="btn btn-record practice-only" onclick="toggleRecord(${v}, this)">
-            🎙 Record Voice
+            🎙 Record
+          </button>
+          <button id="master-btn-${v}" class="btn btn-mastered btn-icon" onclick="toggleAssessment(${v}, 'mastered', this)" title="Mastered">
+            ✅
+          </button>
+          <button id="needsp-btn-${v}" class="btn btn-needs btn-icon" onclick="toggleAssessment(${v}, 'needs_practice', this)" title="Needs Practice">
+            ⚠️
           </button>
         </div>
       </article>`;
@@ -1392,7 +1447,7 @@
       currentPlaybackState = `ref-${verseNum}`;
 
       const btn = document.getElementById(`ref-btn-${verseNum}`);
-      if (btn) btn.innerHTML = '⏸ Reference Tilawat';
+      if (btn) btn.innerHTML = '⏸ Tilawat';
 
       currentAudio = new Audio(audioUrl);
       currentAudio.playbackRate = referencePlaybackRate;
@@ -1409,7 +1464,7 @@
       currentAudio.play();
 
       currentAudio.onended = () => {
-        if (btn) btn.innerHTML = '▶ Reference Tilawat';
+        if (btn) btn.innerHTML = '▶ Tilawat';
         if (onCompleteCallback) onCompleteCallback();
       };
     }
