@@ -402,6 +402,20 @@
       background-color: #475569;
     }
 
+    .btn-repeat {
+      flex: 0 0 auto;
+      background-color: var(--surface);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.65rem 0.85rem;
+    }
+
+    .btn-repeat.active {
+      background-color: rgba(217, 119, 6, 0.2);
+      border-color: var(--accent);
+      color: #fbbf24;
+    }
+
     .btn-qiraat {
       background-color: var(--accent);
       color: white;
@@ -667,8 +681,11 @@
         </div>
 
         <div class="controls-row">
-          <button id="ref-btn-1" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6222, this)">
+          <button id="ref-btn-1" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6222, 1, this)">
             ▶ Reference Tilawat
+          </button>
+          <button id="repeat-btn-1" class="btn btn-repeat listen-only" onclick="toggleVerseRepeat(1, this)" title="Toggle Verse Repeat">
+            🔁 Repeat
           </button>
           <button id="rec-btn-1" class="btn btn-record practice-only" onclick="toggleRecord(1, this)">
             🎙 Record Voice
@@ -699,8 +716,11 @@
         </div>
 
         <div class="controls-row">
-          <button id="ref-btn-2" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6223, this)">
+          <button id="ref-btn-2" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6223, 2, this)">
             ▶ Reference Tilawat
+          </button>
+          <button id="repeat-btn-2" class="btn btn-repeat listen-only" onclick="toggleVerseRepeat(2, this)" title="Toggle Verse Repeat">
+            🔁 Repeat
           </button>
           <button id="rec-btn-2" class="btn btn-record practice-only" onclick="toggleRecord(2, this)">
             🎙 Record Voice
@@ -731,8 +751,11 @@
         </div>
 
         <div class="controls-row">
-          <button id="ref-btn-3" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6224, this)">
+          <button id="ref-btn-3" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6224, 3, this)">
             ▶ Reference Tilawat
+          </button>
+          <button id="repeat-btn-3" class="btn btn-repeat listen-only" onclick="toggleVerseRepeat(3, this)" title="Toggle Verse Repeat">
+            🔁 Repeat
           </button>
           <button id="rec-btn-3" class="btn btn-record practice-only" onclick="toggleRecord(3, this)">
             🎙 Record Voice
@@ -763,8 +786,11 @@
         </div>
 
         <div class="controls-row">
-          <button id="ref-btn-4" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6225, this)">
+          <button id="ref-btn-4" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6225, 4, this)">
             ▶ Reference Tilawat
+          </button>
+          <button id="repeat-btn-4" class="btn btn-repeat listen-only" onclick="toggleVerseRepeat(4, this)" title="Toggle Verse Repeat">
+            🔁 Repeat
           </button>
           <button id="rec-btn-4" class="btn btn-record practice-only" onclick="toggleRecord(4, this)">
             🎙 Record Voice
@@ -829,6 +855,8 @@
     let autoplayTimer = null;
     let playbackUpdateFrame = null;
 
+    let verseRepeatState = { 1: false, 2: false, 3: false, 4: false };
+
     let mediaRecorder = null;
     let audioChunks = [];
     let recordingVerse = null;
@@ -860,6 +888,17 @@
         status.textContent = 'OFF';
         if (autoplayTimer) clearTimeout(autoplayTimer);
         showToast('Autoplay Disabled.');
+      }
+    }
+
+    function toggleVerseRepeat(verseNum, btn) {
+      verseRepeatState[verseNum] = !verseRepeatState[verseNum];
+      if (verseRepeatState[verseNum]) {
+        btn.classList.add('active');
+        showToast(`Repeat enabled for Verse ${verseNum}`);
+      } else {
+        btn.classList.remove('active');
+        showToast(`Repeat disabled for Verse ${verseNum}`);
       }
     }
 
@@ -1020,14 +1059,21 @@
       return `https://cdn.islamic.network/quran/audio/128/${activeQariIdentifier}/${verseId}.mp3`;
     }
 
-    function playSingleVerseQiraat(verseId, btn) {
+    function playSingleVerseQiraat(verseId, verseNum, btn) {
       const stateKey = `ref-${verseId}`;
 
-      if (currentPlaybackState === stateKey && !isPaused && currentAudio) {
-        currentAudio.pause();
-        isPaused = true;
-        btn.innerHTML = '▶ Resume Tilawat';
-        return;
+      if (currentPlaybackState === stateKey && currentAudio) {
+        if (!isPaused) {
+          currentAudio.pause();
+          isPaused = true;
+          btn.innerHTML = '▶ Resume Tilawat';
+          return;
+        } else {
+          currentAudio.play();
+          isPaused = false;
+          btn.innerHTML = '⏸ Pause Tilawat';
+          return;
+        }
       }
 
       stopAllPlayback(true);
@@ -1037,7 +1083,15 @@
       currentAudio = new Audio(getQariUrl(verseId));
       btn.innerHTML = '⏸ Pause Tilawat';
       currentAudio.play();
-      currentAudio.onended = () => stopAllPlayback(true);
+      
+      currentAudio.onended = () => {
+        if (verseRepeatState[verseNum]) {
+          currentAudio.currentTime = 0;
+          currentAudio.play();
+        } else {
+          stopAllPlayback(true);
+        }
+      };
     }
 
     function toggleContinuousQiraat() {
@@ -1071,13 +1125,18 @@
           return;
         }
 
+        const currentVerseNum = currentVerseIndex + 1;
         const url = getQariUrl(verseIds[currentVerseIndex]);
-        qiraatBtn.innerHTML = `⏸ Pause Qira'at (Verse ${currentVerseIndex + 1})`;
+        qiraatBtn.innerHTML = `⏸ Pause Qira'at (Verse ${currentVerseNum})`;
         currentAudio = new Audio(url);
         currentAudio.play();
         currentAudio.onended = () => {
-          currentVerseIndex++;
-          playNext();
+          if (verseRepeatState[currentVerseNum]) {
+            playNext();
+          } else {
+            currentVerseIndex++;
+            playNext();
+          }
         };
       }
       playNext();
