@@ -908,7 +908,7 @@
     function stopAllPlayback(resetPosition = false) {
       if (playbackUpdateFrame) cancelAnimationFrame(playbackUpdateFrame);
       if (autoplayTimer) clearTimeout(autoplayTimer);
-      if (autoStopTimer) clearTimeout(autoStopTimer);
+      if (autoStopTimer) clearInterval(autoStopTimer); // Clears countdown interval
 
       if (currentAudio) {
         currentAudio.pause();
@@ -937,8 +937,13 @@
           if (refBtn) refBtn.innerHTML = '▶ Reference Tilawat';
 
           const recBtn = document.getElementById(`rec-btn-${i}`);
-          if (recBtn && recordedUrls[i]) {
-            recBtn.innerHTML = '🔊 Listen Back';
+          if (recBtn) {
+            recBtn.classList.remove('recording');
+            if (recordedUrls[i]) {
+              recBtn.innerHTML = '🔊 Listen Back';
+            } else {
+              recBtn.innerHTML = '🎙 Record Voice';
+            }
           }
         }
       }
@@ -1054,7 +1059,7 @@
       currentAudio = new Audio(getQariUrl(verseId));
       btn.innerHTML = '⏸ Pause Tilawat';
 
-      // Capture audio metadata length dynamically
+      // Store duration when audio metadata is loaded
       currentAudio.onloadedmetadata = () => {
         referenceDurations[verseNum] = currentAudio.duration;
       };
@@ -1065,7 +1070,7 @@
         stopAllPlayback(true);
         const recBtn = document.getElementById(`rec-btn-${verseNum}`);
         if (recBtn) {
-          // Auto start recording with strict timer based on audio duration
+          // Pass the reference audio duration to set the exact timer limit
           const duration = referenceDurations[verseNum] || currentAudio.duration || 5;
           toggleRecord(verseNum, recBtn, duration);
         }
@@ -1120,7 +1125,7 @@
 
       if (recordingVerse === verseNum && mediaRecorder && mediaRecorder.state === "recording") {
         mediaRecorder.stop();
-        if (autoStopTimer) clearTimeout(autoStopTimer);
+        if (autoStopTimer) clearInterval(autoStopTimer);
         return;
       }
 
@@ -1157,7 +1162,7 @@
 
         mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
         mediaRecorder.onstop = () => {
-          if (autoStopTimer) clearTimeout(autoStopTimer);
+          if (autoStopTimer) clearInterval(autoStopTimer);
           const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
           recordedBlobs[verseNum] = audioBlob;
           recordedUrls[verseNum] = URL.createObjectURL(audioBlob);
@@ -1173,7 +1178,7 @@
           checkFullSurahReady();
           stream.getTracks().forEach(track => track.stop());
 
-          // Auto continuation flow to next reference verse
+          // Auto-advance to the next verse
           const nextVerseNum = verseNum + 1;
           if (nextVerseNum <= verseIds.length) {
             showToast(`Verse ${verseNum} complete! Moving to Verse ${nextVerseNum}...`);
@@ -1191,17 +1196,26 @@
 
         mediaRecorder.start();
         recordingVerse = verseNum;
-        btn.innerHTML = '🎙 Recording (Auto-Stop)...';
         btn.classList.add('recording');
 
-        // Automatically call stop recording based on exact reference tilawat duration
+        // Handle timer display & automatic stopping logic
         if (durationLimit) {
-          const timeoutMs = durationLimit * 1000;
-          autoStopTimer = setTimeout(() => {
-            if (mediaRecorder && mediaRecorder.state === "recording") {
-              mediaRecorder.stop();
+          let remainingSeconds = Math.ceil(durationLimit);
+          btn.innerHTML = `🎙 Recording (${remainingSeconds}s remaining)`;
+
+          autoStopTimer = setInterval(() => {
+            remainingSeconds--;
+            if (remainingSeconds > 0) {
+              btn.innerHTML = `🎙 Recording (${remainingSeconds}s remaining)`;
+            } else {
+              clearInterval(autoStopTimer);
+              if (mediaRecorder && mediaRecorder.state === "recording") {
+                mediaRecorder.stop();
+              }
             }
-          }, timeoutMs);
+          }, 1000);
+        } else {
+          btn.innerHTML = '⏹ Stop Recording';
         }
       } catch (err) {
         showToast('Microphone access denied.');
