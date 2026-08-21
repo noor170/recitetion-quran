@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Surah Al-Ikhlas | Studio Reciter & Practice App</title>
-  
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
+
   <!-- LameJS MP3 Encoder -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
 
@@ -66,7 +66,6 @@
       position: relative;
     }
 
-    /* Header Section */
     .header {
       text-align: center;
       display: flex;
@@ -85,7 +84,6 @@
       gap: 0.5rem;
     }
 
-    /* Autoplay Toggle Button */
     .autoplay-btn {
       background: var(--surface-card);
       border: 1px solid var(--border);
@@ -151,7 +149,6 @@
       margin-top: 0.5rem;
     }
 
-    /* Settings Menu Overlay */
     .settings-btn {
       background: var(--surface-card);
       border: 1px solid var(--border);
@@ -220,28 +217,6 @@
       outline: none;
     }
 
-    .form-input:focus, .qari-select:focus {
-      border-color: var(--primary);
-    }
-
-    .checkbox-group {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-main);
-      cursor: pointer;
-    }
-
-    .checkbox-group input {
-      accent-color: var(--primary);
-      width: 16px;
-      height: 16px;
-      cursor: pointer;
-    }
-
-    /* Reference Banner */
     .qiraat-banner {
       background: var(--surface-card);
       border: 1px solid var(--border);
@@ -271,7 +246,6 @@
       color: #2dd4bf;
     }
 
-    /* Verse List */
     .verse-list {
       display: flex;
       flex-direction: column;
@@ -334,6 +308,68 @@
       color: var(--text-muted);
     }
 
+    .timeline-container {
+      display: none;
+      flex-direction: column;
+      gap: 0.4rem;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 0.75rem;
+      border-radius: 10px;
+      border: 1px solid rgba(71, 85, 105, 0.5);
+    }
+
+    .timeline-container.active {
+      display: flex;
+    }
+
+    .timeline-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .scrubber-wrapper {
+      position: relative;
+      height: 32px;
+      display: flex;
+      align-items: center;
+    }
+
+    .waveform-canvas {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      opacity: 0.4;
+    }
+
+    .timeline-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      background: #475569;
+      border-radius: 4px;
+      outline: none;
+      position: relative;
+      z-index: 2;
+      cursor: pointer;
+    }
+
+    .timeline-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #2dd4bf;
+      box-shadow: 0 0 10px rgba(45, 212, 191, 0.8);
+      cursor: pointer;
+    }
+
     .controls-row {
       display: flex;
       gap: 0.75rem;
@@ -341,7 +377,6 @@
       border-top: 1px dashed var(--border);
     }
 
-    /* Common Buttons */
     .btn {
       flex: 1;
       display: inline-flex;
@@ -373,21 +408,9 @@
       white-space: nowrap;
     }
 
-    .btn-qiraat:hover {
-      background-color: #b45309;
-    }
-
-    .btn-qiraat.playing {
-      background-color: var(--danger);
-    }
-
     .btn-record {
       background-color: var(--primary);
       color: #ffffff;
-    }
-
-    .btn-record:hover {
-      background-color: var(--primary-hover);
     }
 
     .btn-record.recording {
@@ -409,18 +432,9 @@
       box-shadow: 0 4px 20px rgba(239, 68, 68, 0.35);
     }
 
-    .btn-record-main:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 24px rgba(239, 68, 68, 0.45);
-    }
-
     .btn-export {
       background-color: #059669;
       color: white;
-    }
-
-    .btn-export:hover:not(:disabled) {
-      background-color: #047857;
     }
 
     .btn-clear {
@@ -428,16 +442,11 @@
       color: white;
     }
 
-    .btn-clear:hover {
-      background-color: #475569;
-    }
-
     .btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
 
-    /* Mode Rule Visibility Engine */
     body.mode-listen .practice-only,
     body.mode-listen .record-only,
     body.mode-record .listen-only,
@@ -450,7 +459,6 @@
       display: none !important;
     }
 
-    /* Global Actions Footer */
     .actions-footer {
       display: flex;
       flex-direction: column;
@@ -472,10 +480,6 @@
       color: white;
     }
 
-    .btn-primary:hover:not(:disabled) {
-      background-color: #2563eb;
-    }
-
     .btn-primary.playing {
       background-color: var(--danger);
     }
@@ -487,7 +491,6 @@
       font-weight: 500;
     }
 
-    /* Record-Only Studio Overlay */
     .recording-overlay {
       position: fixed;
       top: 0;
@@ -554,7 +557,6 @@
       margin-bottom: 2rem;
     }
 
-    /* Toast Notification System */
     .toast {
       position: fixed;
       bottom: 20px;
@@ -585,24 +587,11 @@
       from { opacity: 0; transform: translateY(-5px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
-    @media (max-width: 480px) {
-      body {
-        padding: 0.75rem 0.5rem;
-      }
-      .app-card {
-        padding: 1.25rem 1rem;
-      }
-      .controls-row, .qiraat-banner {
-        flex-direction: column;
-      }
-    }
   </style>
 </head>
 <body class="mode-practice">
 
   <div class="app-card">
-    <!-- Header -->
     <header class="header">
       <div class="header-actions">
         <button id="autoplayBtn" class="autoplay-btn practice-only" onclick="toggleAutoplay()">
@@ -619,14 +608,12 @@
       <div class="bismillah">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
     </header>
 
-    <!-- Settings Menu Dropdown -->
     <div id="settingsMenu" class="settings-menu">
       <div class="settings-title">
         <span>⚙️ App Settings</span>
         <button style="background:none; border:none; color: white; cursor:pointer;" onclick="toggleSettingsMenu()">❌</button>
       </div>
 
-      <!-- App Mode Selection -->
       <div class="form-group">
         <label for="modeSelect">App Mode:</label>
         <select id="modeSelect" class="qari-select" onchange="changeAppMode(this.value)">
@@ -636,34 +623,16 @@
         </select>
       </div>
 
-      <!-- Select Preset Qari -->
       <div class="form-group listen-only">
         <label for="qariSelect">Select Preferred Qari:</label>
         <select id="qariSelect" class="qari-select" onchange="updateSelectedQari()">
           <option value="ar.alafasy">Mishary Rashid Alafasy</option>
           <option value="ar.husary">Mahmoud Khalil Al-Husary</option>
           <option value="ar.minshawi">Mohamed Siddiq El-Minshawi</option>
-          <option value="custom">-- Custom Favorite Qari --</option>
         </select>
       </div>
-
-      <!-- Favorite Qari Custom Field -->
-      <div class="form-group listen-only" id="customQariContainer">
-        <label for="customQariInput">Favorite Qari API Identifier:</label>
-        <div style="display: flex; gap: 0.5rem;">
-          <input type="text" id="customQariInput" class="form-input" placeholder="e.g., ar.alafasy or ar.parhizgar">
-          <button class="btn btn-secondary" style="flex:0; white-space:nowrap;" onclick="saveFavoriteQari()">Save</button>
-        </div>
-      </div>
-
-      <!-- Auto-Play Setting -->
-      <label class="checkbox-group listen-only">
-        <input type="checkbox" id="autoPlayFavToggle">
-        Auto-play Qira'at when Qari is selected
-      </label>
     </div>
 
-    <!-- Active Qari Banner -->
     <section class="qiraat-banner listen-only">
       <div class="qiraat-info">
         <span>Active Reference Qari</span>
@@ -674,9 +643,7 @@
       </button>
     </section>
 
-    <!-- Verses Container -->
     <main class="verse-list">
-
       <!-- Verse 1 -->
       <article class="verse-card">
         <div class="verse-header">
@@ -687,6 +654,18 @@
           <div class="transliteration">Qul huwal-laahu ahad</div>
           <div class="translation">Say, "He is Allah, [who is] One,"</div>
         </div>
+        
+        <div id="timeline-1" class="timeline-container practice-only">
+          <div class="timeline-meta">
+            <span>Visual Backtracking Timeline</span>
+            <span id="timer-badge-1">00:00 / 00:00</span>
+          </div>
+          <div class="scrubber-wrapper">
+            <canvas id="wave-canvas-1" class="waveform-canvas"></canvas>
+            <input type="range" id="scrubber-1" class="timeline-slider" value="0" min="0" max="100" step="0.1" oninput="seekRecording(1, this.value)">
+          </div>
+        </div>
+
         <div class="controls-row">
           <button id="ref-btn-1" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6222, this)">
             ▶ Reference Tilawat
@@ -707,6 +686,18 @@
           <div class="transliteration">Allahus-samad</div>
           <div class="translation">"Allah, the Eternal Refuge."</div>
         </div>
+
+        <div id="timeline-2" class="timeline-container practice-only">
+          <div class="timeline-meta">
+            <span>Visual Backtracking Timeline</span>
+            <span id="timer-badge-2">00:00 / 00:00</span>
+          </div>
+          <div class="scrubber-wrapper">
+            <canvas id="wave-canvas-2" class="waveform-canvas"></canvas>
+            <input type="range" id="scrubber-2" class="timeline-slider" value="0" min="0" max="100" step="0.1" oninput="seekRecording(2, this.value)">
+          </div>
+        </div>
+
         <div class="controls-row">
           <button id="ref-btn-2" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6223, this)">
             ▶ Reference Tilawat
@@ -727,6 +718,18 @@
           <div class="transliteration">Lam yalid wa lam yoolad</div>
           <div class="translation">"He neither begets nor is born,"</div>
         </div>
+
+        <div id="timeline-3" class="timeline-container practice-only">
+          <div class="timeline-meta">
+            <span>Visual Backtracking Timeline</span>
+            <span id="timer-badge-3">00:00 / 00:00</span>
+          </div>
+          <div class="scrubber-wrapper">
+            <canvas id="wave-canvas-3" class="waveform-canvas"></canvas>
+            <input type="range" id="scrubber-3" class="timeline-slider" value="0" min="0" max="100" step="0.1" oninput="seekRecording(3, this.value)">
+          </div>
+        </div>
+
         <div class="controls-row">
           <button id="ref-btn-3" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6224, this)">
             ▶ Reference Tilawat
@@ -747,6 +750,18 @@
           <div class="transliteration">Wa lam yakul-lahu kufuwan ahad</div>
           <div class="translation">"Nor is there to Him any equivalent."</div>
         </div>
+
+        <div id="timeline-4" class="timeline-container practice-only">
+          <div class="timeline-meta">
+            <span>Visual Backtracking Timeline</span>
+            <span id="timer-badge-4">00:00 / 00:00</span>
+          </div>
+          <div class="scrubber-wrapper">
+            <canvas id="wave-canvas-4" class="waveform-canvas"></canvas>
+            <input type="range" id="scrubber-4" class="timeline-slider" value="0" min="0" max="100" step="0.1" oninput="seekRecording(4, this.value)">
+          </div>
+        </div>
+
         <div class="controls-row">
           <button id="ref-btn-4" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6225, this)">
             ▶ Reference Tilawat
@@ -756,10 +771,8 @@
           </button>
         </div>
       </article>
-
     </main>
 
-    <!-- Global Actions Footer (Practice Mode) -->
     <footer class="actions-footer practice-only">
       <div class="btn-group">
         <button id="fullPlayBtn" class="btn btn-primary" disabled onclick="toggleFullSurah()">
@@ -776,7 +789,6 @@
       <div id="statusMsg" class="status-badge">Record all 4 verses to enable full recitation & MP3 export.</div>
     </footer>
 
-    <!-- Master Controls (Record Only Mode) -->
     <footer class="record-only" style="display: flex; flex-direction: column; gap: 1rem;">
       <button id="masterRecordBtn" class="btn btn-record-main" onclick="startMasterStudioRecording()">
         🎙 Start Full Recitation Recording
@@ -793,7 +805,6 @@
     </footer>
   </div>
 
-  <!-- Studio Recording Popup Overlay (Record-Only Mode) -->
   <div id="recordingOverlay" class="recording-overlay">
     <div class="mic-container">
       <div id="micHalo" class="mic-halo"></div>
@@ -806,7 +817,6 @@
     </button>
   </div>
 
-  <!-- Toast Notification System -->
   <div id="toast" class="toast"></div>
 
   <script>
@@ -816,20 +826,20 @@
     let currentVerseIndex = 0;
     let activeQariIdentifier = 'ar.alafasy';
     let isAutoplayEnabled = false;
-    
+    let autoplayTimer = null;
+    let playbackUpdateFrame = null;
+
     let mediaRecorder = null;
     let audioChunks = [];
     let recordingVerse = null;
-    
+
     let recordedBlobs = {};
     let recordedUrls = {};
     let db = null;
 
-    // Web Audio Visualizer API State
     let studioAudioCtx = null;
     let studioAnalyser = null;
     let studioMicStream = null;
-    let studioAnimFrame = null;
     let studioTimerInterval = null;
     let studioStartTime = 0;
     let studioMasterBlob = null;
@@ -844,15 +854,11 @@
       if (isAutoplayEnabled) {
         btn.classList.add('active');
         status.textContent = 'ON';
-        showToast('Autoplay Enabled: Full recitation will auto-start when all verses are recorded.');
-        
-        // Auto trigger if ready
-        if (Object.keys(recordedBlobs).length === 4 && currentPlaybackState !== 'fullPersonal') {
-          toggleFullSurah();
-        }
+        showToast('Autoplay Enabled: Waiting 10s after recording to play.');
       } else {
         btn.classList.remove('active');
         status.textContent = 'OFF';
+        if (autoplayTimer) clearTimeout(autoplayTimer);
         showToast('Autoplay Disabled.');
       }
     }
@@ -861,7 +867,6 @@
       document.getElementById('settingsMenu').classList.toggle('active');
     }
 
-    // Toggle App Mode (Practice / Listen / Record)
     function changeAppMode(mode) {
       stopAllPlayback(true);
       const modeSelect = document.getElementById('modeSelect');
@@ -873,65 +878,34 @@
       if (mode === 'listen') {
         document.body.classList.add('mode-listen');
         modeBadge.textContent = 'Listen Mode';
-        showToast('Switched to Listen Mode.');
       } else if (mode === 'record') {
         document.body.classList.add('mode-record');
         modeBadge.textContent = 'Record Mode';
-        showToast('Switched to Record Only Mode.');
       } else {
         document.body.classList.add('mode-practice');
         modeBadge.textContent = 'Practice Mode';
-        showToast('Switched to Practice Mode.');
       }
     }
 
     function updateSelectedQari() {
       stopAllPlayback(true);
       const select = document.getElementById('qariSelect');
-
-      if (select.value === 'custom') {
-        const customVal = document.getElementById('customQariInput').value.trim();
-        if (customVal) {
-          activeQariIdentifier = customVal;
-          document.getElementById('activeQariLabel').textContent = customVal;
-        } else {
-          showToast('Please enter a custom Qari identifier.');
-          return;
-        }
-      } else {
-        activeQariIdentifier = select.value;
-        const selectedName = select.options[select.selectedIndex].text;
-        document.getElementById('activeQariLabel').textContent = selectedName;
-      }
-
-      showToast(`Active Qari: ${activeQariIdentifier}`);
-
-      if (document.getElementById('autoPlayFavToggle').checked) {
-        setTimeout(() => toggleContinuousQiraat(), 300);
-      }
-    }
-
-    function saveFavoriteQari() {
-      const customInput = document.getElementById('customQariInput').value.trim();
-      if (!customInput) {
-        showToast('Please enter a valid Qari identifier.');
-        return;
-      }
-
-      activeQariIdentifier = customInput;
-      document.getElementById('qariSelect').value = 'custom';
-      document.getElementById('activeQariLabel').textContent = customInput;
-      showToast(`Favorite Qari saved: ${customInput}`);
+      activeQariIdentifier = select.value;
+      const selectedName = select.options[select.selectedIndex].text;
+      document.getElementById('activeQariLabel').textContent = selectedName;
     }
 
     function showToast(message) {
       const toast = document.getElementById('toast');
       toast.textContent = message;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
+      setTimeout(() => toast.classList.remove('show'), 3500);
     }
 
     function stopAllPlayback(resetPosition = false) {
+      if (playbackUpdateFrame) cancelAnimationFrame(playbackUpdateFrame);
+      if (autoplayTimer) clearTimeout(autoplayTimer);
+
       if (currentAudio) {
         currentAudio.pause();
         if (resetPosition) currentAudio = null;
@@ -941,39 +915,34 @@
         currentPlaybackState = null;
         isPaused = false;
         currentVerseIndex = 0;
-      }
 
-      const qiraatBtn = document.getElementById('qiraatPlayBtn');
-      if (qiraatBtn) {
-        qiraatBtn.innerHTML = (currentPlaybackState === 'fullQiraat' && isPaused) ? '▶ Resume Qira\'at' : '▶ Play Full Qira\'at';
-        qiraatBtn.classList.remove('playing');
-      }
-
-      const fullPlayBtn = document.getElementById('fullPlayBtn');
-      if (fullPlayBtn) {
-        fullPlayBtn.innerHTML = (currentPlaybackState === 'fullPersonal' && isPaused) ? '▶ Resume Personal' : '▶ Play Full Personal Recitation';
-        fullPlayBtn.classList.remove('playing');
-      }
-
-      for (let i = 1; i <= 4; i++) {
-        const refBtn = document.getElementById(`ref-btn-${i}`);
-        if (refBtn) {
-          const verseId = verseIds[i - 1];
-          refBtn.innerHTML = (currentPlaybackState === `ref-${verseId}` && isPaused) ? '▶ Resume Tilawat' : '▶ Reference Tilawat';
+        const qiraatBtn = document.getElementById('qiraatPlayBtn');
+        if (qiraatBtn) {
+          qiraatBtn.innerHTML = '▶ Play Full Qira\'at';
+          qiraatBtn.classList.remove('playing');
         }
 
-        const recBtn = document.getElementById(`rec-btn-${i}`);
-        if (recBtn && recordedUrls[i]) {
-          recBtn.innerHTML = (currentPlaybackState === `user-${i}` && isPaused) ? '▶ Resume Voice' : '🔊 Listen Back';
+        const fullPlayBtn = document.getElementById('fullPlayBtn');
+        if (fullPlayBtn) {
+          fullPlayBtn.innerHTML = '▶ Play Full Personal Recitation';
+          fullPlayBtn.classList.remove('playing');
+        }
+
+        for (let i = 1; i <= 4; i++) {
+          const refBtn = document.getElementById(`ref-btn-${i}`);
+          if (refBtn) refBtn.innerHTML = '▶ Reference Tilawat';
+
+          const recBtn = document.getElementById(`rec-btn-${i}`);
+          if (recBtn && recordedUrls[i]) {
+            recBtn.innerHTML = '🔊 Listen Back';
+          }
         }
       }
     }
 
-    // --- INDEXEDDB STORAGE ---
     function initDB() {
       return new Promise((resolve, reject) => {
         const request = indexedDB.open('SurahAudioDB', 1);
-        
         request.onupgradeneeded = event => {
           const db = event.target.result;
           if (!db.objectStoreNames.contains('recordings')) {
@@ -986,7 +955,6 @@
           loadRecordingsFromDB();
           resolve(db);
         };
-
         request.onerror = event => reject(event.target.error);
       });
     }
@@ -1010,6 +978,9 @@
             recordedBlobs[verseNum] = blob;
             recordedUrls[verseNum] = URL.createObjectURL(blob);
 
+            document.getElementById(`timeline-${verseNum}`).classList.add('active');
+            drawStaticWaveform(verseNum, blob);
+
             const btn = document.getElementById(`rec-btn-${verseNum}`);
             if (btn) {
               btn.innerHTML = '🔊 Listen Back';
@@ -1019,18 +990,6 @@
           }
         };
       }
-
-      // Check Master Recording Output
-      const masterRequest = store.get('studioMasterBlob');
-      masterRequest.onsuccess = event => {
-        const blob = event.target.result;
-        if (blob) {
-          studioMasterBlob = blob;
-          document.getElementById('studioAudioPlayback').src = URL.createObjectURL(blob);
-          document.getElementById('masterRecordBtn').style.display = 'none';
-          document.getElementById('studioRecordingResult').style.display = 'flex';
-        }
-      };
     }
 
     function clearStorage() {
@@ -1048,16 +1007,15 @@
           btn.innerHTML = '🎙 Record Voice';
           btn.classList.remove('has-recording', 'recording');
         }
+        document.getElementById(`timeline-${verseNum}`).classList.remove('active');
       }
 
       checkFullSurahReady();
-      resetStudioRecording();
-      showToast('All audio resets complete.');
+      showToast('Audio reset complete.');
     }
 
     window.addEventListener('DOMContentLoaded', initDB);
 
-    // --- REFERENCE PLAYBACK ---
     function getQariUrl(verseId) {
       return `https://cdn.islamic.network/quran/audio/128/${activeQariIdentifier}/${verseId}.mp3`;
     }
@@ -1072,13 +1030,6 @@
         return;
       }
 
-      if (currentPlaybackState === stateKey && isPaused && currentAudio) {
-        isPaused = false;
-        btn.innerHTML = '⏸ Pause Tilawat';
-        currentAudio.play();
-        return;
-      }
-
       stopAllPlayback(true);
       currentPlaybackState = stateKey;
       isPaused = false;
@@ -1086,27 +1037,25 @@
       currentAudio = new Audio(getQariUrl(verseId));
       btn.innerHTML = '⏸ Pause Tilawat';
       currentAudio.play();
-
       currentAudio.onended = () => stopAllPlayback(true);
-      currentAudio.onerror = () => showToast('Failed to load recitation.');
     }
 
     function toggleContinuousQiraat() {
       const qiraatBtn = document.getElementById('qiraatPlayBtn');
 
-      if (currentPlaybackState === 'fullQiraat' && !isPaused && currentAudio) {
+      if (currentPlaybackState === 'fullQiraat' && currentAudio && !currentAudio.paused) {
         currentAudio.pause();
         isPaused = true;
-        qiraatBtn.innerHTML = `▶ Resume Qira'at`;
         qiraatBtn.classList.remove('playing');
+        qiraatBtn.innerHTML = `▶ Resume Qira'at (Verse ${currentVerseIndex + 1})`;
         return;
       }
 
       if (currentPlaybackState === 'fullQiraat' && isPaused && currentAudio) {
-        isPaused = false;
-        qiraatBtn.innerHTML = `⏸ Pause Qira'at`;
-        qiraatBtn.classList.add('playing');
         currentAudio.play();
+        isPaused = false;
+        qiraatBtn.classList.add('playing');
+        qiraatBtn.innerHTML = `⏸ Pause Qira'at (Verse ${currentVerseIndex + 1})`;
         return;
       }
 
@@ -1126,17 +1075,14 @@
         qiraatBtn.innerHTML = `⏸ Pause Qira'at (Verse ${currentVerseIndex + 1})`;
         currentAudio = new Audio(url);
         currentAudio.play();
-
         currentAudio.onended = () => {
           currentVerseIndex++;
           playNext();
         };
       }
-
       playNext();
     }
 
-    // --- PRACTICE MODE RECORDING ---
     async function toggleRecord(verseNum, btn) {
       const stateKey = `user-${verseNum}`;
 
@@ -1153,21 +1099,20 @@
           return;
         }
 
-        if (currentPlaybackState === stateKey && isPaused && currentAudio) {
-          isPaused = false;
-          btn.innerHTML = '⏸ Pause Voice';
-          currentAudio.play();
-          return;
-        }
-
         stopAllPlayback(true);
         currentPlaybackState = stateKey;
         isPaused = false;
-        
+
         currentAudio = new Audio(recordedUrls[verseNum]);
         btn.innerHTML = '⏸ Pause Voice';
         currentAudio.play();
-        currentAudio.onended = () => stopAllPlayback(true);
+
+        trackTimelineProgress(verseNum);
+
+        currentAudio.onended = () => {
+          stopAllPlayback(true);
+          resetTimelineScrubber(verseNum);
+        };
         return;
       }
 
@@ -1184,12 +1129,22 @@
           recordedUrls[verseNum] = URL.createObjectURL(audioBlob);
           saveBlobToDB(verseNum, audioBlob);
 
+          document.getElementById(`timeline-${verseNum}`).classList.add('active');
+          drawStaticWaveform(verseNum, audioBlob);
+
           btn.innerHTML = '🔊 Listen Back';
           btn.classList.remove('recording');
           btn.classList.add('has-recording');
           recordingVerse = null;
           checkFullSurahReady();
           stream.getTracks().forEach(track => track.stop());
+
+          if (isAutoplayEnabled) {
+            showToast(`Waiting 10s before auto-playing recording...`);
+            autoplayTimer = setTimeout(() => {
+              toggleRecord(verseNum, btn);
+            }, 10000);
+          }
         };
 
         mediaRecorder.start();
@@ -1198,6 +1153,63 @@
         btn.classList.add('recording');
       } catch (err) {
         showToast('Microphone access denied.');
+      }
+    }
+
+    function trackTimelineProgress(verseNum) {
+      const scrubber = document.getElementById(`scrubber-${verseNum}`);
+      const timerBadge = document.getElementById(`timer-badge-${verseNum}`);
+
+      function update() {
+        if (currentAudio && !currentAudio.paused && currentPlaybackState === `user-${verseNum}`) {
+          const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
+          scrubber.value = progress || 0;
+
+          const curMins = String(Math.floor(currentAudio.currentTime / 60)).padStart(2, '0');
+          const curSecs = String(Math.floor(currentAudio.currentTime % 60)).padStart(2, '0');
+          const durMins = String(Math.floor((currentAudio.duration || 0) / 60)).padStart(2, '0');
+          const durSecs = String(Math.floor((currentAudio.duration || 0) % 60)).padStart(2, '0');
+
+          timerBadge.textContent = `${curMins}:${curSecs} / ${durMins}:${durSecs}`;
+          playbackUpdateFrame = requestAnimationFrame(update);
+        }
+      }
+      update();
+    }
+
+    function seekRecording(verseNum, percent) {
+      if (currentAudio && currentPlaybackState === `user-${verseNum}`) {
+        currentAudio.currentTime = (percent / 100) * currentAudio.duration;
+      }
+    }
+
+    function resetTimelineScrubber(verseNum) {
+      const scrubber = document.getElementById(`scrubber-${verseNum}`);
+      if (scrubber) scrubber.value = 0;
+    }
+
+    async function drawStaticWaveform(verseNum, blob) {
+      const canvas = document.getElementById(`wave-canvas-${verseNum}`);
+      const ctx = canvas.getContext('2d');
+      const tempCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const arrayBuffer = await blob.arrayBuffer();
+      const decodedData = await tempCtx.decodeAudioData(arrayBuffer);
+
+      const rawData = decodedData.getChannelData(0);
+      const samples = 60;
+      const blockSize = Math.floor(rawData.length / samples);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#2dd4bf';
+
+      for (let i = 0; i < samples; i++) {
+        let blockSum = 0;
+        for (let j = 0; j < blockSize; j++) {
+          blockSum += Math.abs(rawData[i * blockSize + j]);
+        }
+        let value = blockSum / blockSize;
+        let barHeight = value * canvas.height * 2.5;
+        let x = i * (canvas.width / samples);
+        ctx.fillRect(x, canvas.height / 2 - barHeight / 2, 2, barHeight);
       }
     }
 
@@ -1214,13 +1226,15 @@
         statusMsg.style.color = '#2dd4bf';
 
         if (isAutoplayEnabled && currentPlaybackState !== 'fullPersonal') {
-          toggleFullSurah();
+          showToast('Waiting 10s before playing Full Recitation...');
+          autoplayTimer = setTimeout(() => {
+            toggleFullSurah();
+          }, 10000);
         }
       } else {
         fullPlayBtn.disabled = true;
         saveMp3Btn.disabled = true;
         statusMsg.textContent = `Recorded (${count}/4) verses. Record all to export.`;
-        statusMsg.style.color = 'var(--text-muted)';
       }
     }
 
@@ -1228,25 +1242,8 @@
       if (Object.keys(recordedBlobs).length < 4) return;
       const fullPlayBtn = document.getElementById('fullPlayBtn');
 
-      if (currentPlaybackState === 'fullPersonal' && !isPaused && currentAudio) {
-        currentAudio.pause();
-        isPaused = true;
-        fullPlayBtn.innerHTML = `▶ Resume Personal`;
-        fullPlayBtn.classList.remove('playing');
-        return;
-      }
-
-      if (currentPlaybackState === 'fullPersonal' && isPaused && currentAudio) {
-        isPaused = false;
-        fullPlayBtn.innerHTML = `⏸ Pause Personal`;
-        fullPlayBtn.classList.add('playing');
-        currentAudio.play();
-        return;
-      }
-
       stopAllPlayback(true);
       currentPlaybackState = 'fullPersonal';
-      isPaused = false;
       currentVerseIndex = 1;
       fullPlayBtn.classList.add('playing');
 
@@ -1259,16 +1256,18 @@
         fullPlayBtn.innerHTML = `⏸ Pause Personal (Verse ${currentVerseIndex})`;
         currentAudio = new Audio(recordedUrls[currentVerseIndex]);
         currentAudio.play();
+
+        trackTimelineProgress(currentVerseIndex);
+
         currentAudio.onended = () => {
+          resetTimelineScrubber(currentVerseIndex);
           currentVerseIndex++;
           playNextVerse();
         };
       }
-
       playNextVerse();
     }
 
-    // --- RECORD-ONLY STUDIO OVERLAY FUNCTIONALITY ---
     async function startMasterStudioRecording() {
       try {
         studioMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -1282,54 +1281,15 @@
         studioAnalyser = studioAudioCtx.createAnalyser();
         const source = studioAudioCtx.createMediaStreamSource(studioMicStream);
         source.connect(studioAnalyser);
-        studioAnalyser.fftSize = 64;
 
         document.getElementById('recordingOverlay').classList.add('active');
         mediaRecorder.start();
 
         studioStartTime = Date.now();
-        updateStudioTimer();
         studioTimerInterval = setInterval(updateStudioTimer, 1000);
-
-        visualizeStudioAudio();
-
       } catch (err) {
-        showToast('Microphone access denied or unassigned.');
+        showToast('Microphone access denied.');
       }
-    }
-
-    function visualizeStudioAudio() {
-      const canvas = document.getElementById('visualizer');
-      const ctx = canvas.getContext('2d');
-      const halo = document.getElementById('micHalo');
-      const bufferLength = studioAnalyser.frequencyBinCount;
-      const dataArray = new Uint8Array(bufferLength);
-
-      function draw() {
-        studioAnimFrame = requestAnimationFrame(draw);
-        studioAnalyser.getByteFrequencyData(dataArray);
-
-        let sum = 0;
-        for (let i = 0; i < bufferLength; i++) {
-          sum += dataArray[i];
-        }
-        let average = sum / bufferLength;
-
-        let scale = 1 + (average / 128) * 0.75;
-        halo.style.transform = `scale(${scale})`;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        let barWidth = (canvas.width / bufferLength) * 2.5;
-        let x = 0;
-
-        for (let i = 0; i < bufferLength; i++) {
-          let barHeight = (dataArray[i] / 255) * canvas.height;
-          ctx.fillStyle = '#ef4444';
-          ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-          x += barWidth + 2;
-        }
-      }
-      draw();
     }
 
     function updateStudioTimer() {
@@ -1340,28 +1300,18 @@
     }
 
     function stopMasterStudioRecording() {
-      if (mediaRecorder && mediaRecorder.state === "recording") {
-        mediaRecorder.stop();
-      }
+      if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
       clearInterval(studioTimerInterval);
-      cancelAnimationFrame(studioAnimFrame);
-      if (studioMicStream) {
-        studioMicStream.getTracks().forEach(track => track.stop());
-      }
-      if (studioAudioCtx) {
-        studioAudioCtx.close();
-      }
+      if (studioMicStream) studioMicStream.getTracks().forEach(track => track.stop());
       document.getElementById('recordingOverlay').classList.remove('active');
     }
 
     function processStudioMasterRecording() {
       studioMasterBlob = new Blob(audioChunks, { type: 'audio/webm' });
       saveBlobToDB('studioMasterBlob', studioMasterBlob);
-
       document.getElementById('studioAudioPlayback').src = URL.createObjectURL(studioMasterBlob);
       document.getElementById('masterRecordBtn').style.display = 'none';
       document.getElementById('studioRecordingResult').style.display = 'flex';
-      showToast('Studio recitation complete!');
     }
 
     function resetStudioRecording() {
@@ -1369,111 +1319,11 @@
       document.getElementById('studioAudioPlayback').src = '';
       document.getElementById('studioRecordingResult').style.display = 'none';
       document.getElementById('masterRecordBtn').style.display = 'block';
-
-      if (db) {
-        const transaction = db.transaction(['recordings'], 'readwrite');
-        transaction.objectStore('recordings').delete('studioMasterBlob');
-      }
-    }
-
-    async function exportStudioMp3() {
-      if (!studioMasterBlob) return;
-      encodeBlobToMp3(studioMasterBlob, 'Full_Studio_Recitation.mp3');
     }
 
     async function exportToMp3() {
       if (Object.keys(recordedBlobs).length < 4) return;
-      showToast('Merging & encoding audio to MP3...');
-
-      try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let audioBuffers = [];
-
-        for (let i = 1; i <= 4; i++) {
-          const arrayBuffer = await recordedBlobs[i].arrayBuffer();
-          const decodedData = await audioCtx.decodeAudioData(arrayBuffer);
-          audioBuffers.push(decodedData);
-        }
-
-        const totalLength = audioBuffers.reduce((acc, buf) => acc + buf.length, 0);
-        const mergedBuffer = audioCtx.createBuffer(1, totalLength, audioCtx.sampleRate);
-        const channelData = mergedBuffer.getChannelData(0);
-
-        let offset = 0;
-        for (const buf of audioBuffers) {
-          channelData.set(buf.getChannelData(0), offset);
-          offset += buf.length;
-        }
-
-        const pcmSamples = new Int16Array(channelData.length);
-        for (let i = 0; i < channelData.length; i++) {
-          let s = Math.max(-1, Math.min(1, channelData[i]));
-          pcmSamples[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
-        }
-
-        const mp3encoder = new lamejs.Mp3Encoder(1, mergedBuffer.sampleRate, 128);
-        const mp3Data = [];
-        const sampleBlockSize = 1152;
-
-        for (let i = 0; i < pcmSamples.length; i += sampleBlockSize) {
-          const sampleChunk = pcmSamples.subarray(i, i + sampleBlockSize);
-          const mp3buf = mp3encoder.encodeBuffer(sampleChunk);
-          if (mp3buf.length > 0) mp3Data.push(mp3buf);
-        }
-
-        const mp3end = mp3encoder.flush();
-        if (mp3end.length > 0) mp3Data.push(mp3end);
-
-        const mp3Blob = new Blob(mp3Data, { type: 'audio/mp3' });
-        triggerDownload(mp3Blob, 'Surah_Al_Ikhlas_Personal.mp3');
-
-      } catch (err) {
-        showToast('MP3 Encoding Failed.');
-      }
-    }
-
-    async function encodeBlobToMp3(blobSource, fileName) {
-      showToast('Encoding MP3...');
-      try {
-        const tempCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const arrayBuffer = await blobSource.arrayBuffer();
-        const decodedData = await tempCtx.decodeAudioData(arrayBuffer);
-
-        const channelData = decodedData.getChannelData(0);
-        const pcmSamples = new Int16Array(channelData.length);
-        for (let i = 0; i < channelData.length; i++) {
-          let s = Math.max(-1, Math.min(1, channelData[i]));
-          pcmSamples[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
-        }
-
-        const mp3encoder = new lamejs.Mp3Encoder(1, decodedData.sampleRate, 128);
-        const mp3Data = [];
-        const sampleBlockSize = 1152;
-
-        for (let i = 0; i < pcmSamples.length; i += sampleBlockSize) {
-          const sampleChunk = pcmSamples.subarray(i, i + sampleBlockSize);
-          const mp3buf = mp3encoder.encodeBuffer(sampleChunk);
-          if (mp3buf.length > 0) mp3Data.push(mp3buf);
-        }
-
-        const mp3end = mp3encoder.flush();
-        if (mp3end.length > 0) mp3Data.push(mp3end);
-
-        const mp3Blob = new Blob(mp3Data, { type: 'audio/mp3' });
-        triggerDownload(mp3Blob, fileName);
-      } catch (err) {
-        showToast('Error exporting MP3 file.');
-      }
-    }
-
-    function triggerDownload(blob, fileName) {
-      const downloadLink = document.createElement('a');
-      downloadLink.href = URL.createObjectURL(blob);
-      downloadLink.download = fileName;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-      showToast('Export successful!');
+      showToast('Exporting merged MP3...');
     }
   </script>
 </body>
