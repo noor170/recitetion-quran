@@ -1386,17 +1386,14 @@
 
         studioAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
         studioAnalyser = studioAudioCtx.createAnalyser();
-        studioAnalyser.fftSize = 64;
-
         const source = studioAudioCtx.createMediaStreamSource(studioMicStream);
         source.connect(studioAnalyser);
 
         document.getElementById('recordingOverlay').classList.add('active');
         mediaRecorder.start();
 
-        drawVisualizer();
-
         studioStartTime = Date.now();
+        document.getElementById('recTimer').textContent = '00:00';
         studioTimerInterval = setInterval(updateStudioTimer, 1000);
       } catch (err) {
         showToast('Microphone access denied.');
@@ -1411,11 +1408,13 @@
     }
 
     function stopMasterStudioRecording() {
-      if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
+      if (mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+      }
       clearInterval(studioTimerInterval);
-      if (visualizerFrame) cancelAnimationFrame(visualizerFrame);
-      if (studioMicStream) studioMicStream.getTracks().forEach(track => track.stop());
-      if (studioAudioCtx) studioAudioCtx.close();
+      if (studioMicStream) {
+        studioMicStream.getTracks().forEach(track => track.stop());
+      }
       document.getElementById('recordingOverlay').classList.remove('active');
     }
 
@@ -1423,8 +1422,10 @@
       studioMasterBlob = new Blob(audioChunks, { type: 'audio/webm' });
       saveBlobToDB('studioMasterBlob', studioMasterBlob);
       document.getElementById('studioAudioPlayback').src = URL.createObjectURL(studioMasterBlob);
+      
       document.getElementById('masterRecordBtn').style.display = 'none';
       document.getElementById('studioRecordingResult').style.display = 'flex';
+      showToast('Master recitation saved successfully.');
     }
 
     function resetStudioRecording() {
@@ -1432,10 +1433,7 @@
       document.getElementById('studioAudioPlayback').src = '';
       document.getElementById('studioRecordingResult').style.display = 'none';
       document.getElementById('masterRecordBtn').style.display = 'block';
-      if (db) {
-        const transaction = db.transaction(['recordings'], 'readwrite');
-        transaction.objectStore('recordings').delete('studioMasterBlob');
-      }
+      showToast('Studio recording cleared.');
     }
 
     async function encodeBlobToMp3(blob) {
