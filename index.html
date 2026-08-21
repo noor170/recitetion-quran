@@ -485,6 +485,30 @@
       outline: none;
     }
 
+    .speed-controls {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .speed-btn {
+      flex: 1;
+      background-color: var(--surface);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.45rem 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .speed-btn.active {
+      background-color: rgba(13, 148, 136, 0.2);
+      border-color: var(--primary);
+      color: #2dd4bf;
+    }
+
     .btn-record.recording {
       background-color: var(--danger);
       animation: pulse-red 1.5s infinite;
@@ -700,6 +724,15 @@
       </div>
 
       <div class="form-group">
+        <label>Reference Speed:</label>
+        <div class="speed-controls">
+          <button type="button" class="speed-btn" onclick="setReferenceSpeed(0.75, this)">0.75×</button>
+          <button type="button" class="speed-btn active" onclick="setReferenceSpeed(1.0, this)">1.0×</button>
+          <button type="button" class="speed-btn" onclick="setReferenceSpeed(1.25, this)">1.25×</button>
+        </div>
+      </div>
+
+      <div class="form-group">
         <label class="switch-row" for="autoplaySwitch">
           <span>🔄 Autoplay (Practice Mode)</span>
           <label class="switch">
@@ -799,6 +832,7 @@
     let autoStopRecordingTimer = null;
     let countdownInterval = null;
     let loopConfig = {}; // verseNum -> { active, start, end } for A/B micro-loop rehearse
+    let referencePlaybackRate = 1.0; // playback speed for reference Qari audio
 
     let recordedBlobs = {};
     let recordedUrls = {};
@@ -1149,6 +1183,7 @@
       isPaused = false;
 
       currentAudio = new Audio(audioUrl);
+      currentAudio.playbackRate = referencePlaybackRate;
       btn.innerHTML = '⏸ Pause Tilawat';
 
       currentAudio.onloadedmetadata = () => {
@@ -1360,6 +1395,7 @@
       if (btn) btn.innerHTML = '⏸ Reference Tilawat';
 
       currentAudio = new Audio(audioUrl);
+      currentAudio.playbackRate = referencePlaybackRate;
 
       // Capture audio metadata to determine exact recording duration
       currentAudio.onloadedmetadata = () => {
@@ -1416,6 +1452,17 @@
       if (currentAudio.currentTime >= end) {
         currentAudio.currentTime = start;
       }
+    }
+
+    // Reference playback speed control (0.75×, 1.0×, 1.25×)
+    function setReferenceSpeed(rate, btn) {
+      referencePlaybackRate = rate;
+      document.querySelectorAll('.speed-btn').forEach(b => b.classList.toggle('active', b === btn));
+      // Apply live to the currently playing reference audio
+      if (currentAudio && currentPlaybackState && currentPlaybackState.startsWith('ref-')) {
+        currentAudio.playbackRate = rate;
+      }
+      showToast(`Reference speed set to ${rate}×`);
     }
 
     // 4. Automated Practice Cycle Controller
