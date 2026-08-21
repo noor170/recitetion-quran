@@ -1178,19 +1178,23 @@
           checkFullSurahReady();
           stream.getTracks().forEach(track => track.stop());
 
-          // Auto-advance to the next verse
-          const nextVerseNum = verseNum + 1;
-          if (nextVerseNum <= verseIds.length) {
-            showToast(`Verse ${verseNum} complete! Moving to Verse ${nextVerseNum}...`);
-            setTimeout(() => {
-              const nextRefBtn = document.getElementById(`ref-btn-${nextVerseNum}`);
-              const nextVerseId = verseIds[nextVerseNum - 1];
-              if (nextRefBtn) {
-                playSingleVerseQiraat(nextVerseId, nextRefBtn);
-              }
-            }, 1500);
+          // AUTOPLAY CONTROL: Only advance to the next verse if Autoplay is switched ON
+          if (isAutoplayEnabled) {
+            const nextVerseNum = verseNum + 1;
+            if (nextVerseNum <= verseIds.length) {
+              showToast(`Verse ${verseNum} complete! Moving to Verse ${nextVerseNum}...`);
+              setTimeout(() => {
+                const nextRefBtn = document.getElementById(`ref-btn-${nextVerseNum}`);
+                const nextVerseId = verseIds[nextVerseNum - 1];
+                if (nextRefBtn) {
+                  playSingleVerseQiraat(nextVerseId, nextRefBtn);
+                }
+              }, 1500);
+            } else {
+              showToast('All verses completed!');
+            }
           } else {
-            showToast('All verses completed!');
+            showToast(`Verse ${verseNum} recorded. (Autoplay is OFF)`);
           }
         };
 
