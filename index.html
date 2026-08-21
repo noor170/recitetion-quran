@@ -84,27 +84,6 @@
       gap: 0.5rem;
     }
 
-    .autoplay-btn {
-      background: var(--surface-card);
-      border: 1px solid var(--border);
-      border-radius: 9999px;
-      padding: 0.4rem 0.85rem;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-      transition: all 0.2s ease;
-    }
-
-    .autoplay-btn.active {
-      background: rgba(16, 185, 129, 0.2);
-      border-color: var(--success);
-      color: #34d399;
-    }
-
     .badge-group {
       display: flex;
       gap: 0.5rem;
@@ -202,6 +181,56 @@
       font-size: 0.8rem;
       font-weight: 600;
       color: var(--text-muted);
+    }
+
+    .switch-row {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-main);
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      flex: 0 0 auto;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: var(--border);
+      border-radius: 9999px;
+      transition: background-color 0.2s ease;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      top: 3px;
+      background-color: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s ease;
+    }
+
+    .switch input:checked + .slider {
+      background-color: var(--primary);
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(20px);
     }
 
     .form-input, .qari-select {
@@ -594,9 +623,6 @@
   <div class="app-card">
     <header class="header">
       <div class="header-actions">
-        <button id="autoplayBtn" class="autoplay-btn active practice-only" onclick="toggleAutoplay()">
-          <span>🔄</span> Autoplay: <strong id="autoplayStatus">ON</strong>
-        </button>
         <button class="settings-btn" onclick="toggleSettingsMenu()" title="Settings">⚙️</button>
       </div>
 
@@ -621,6 +647,16 @@
           <option value="listen">Listen Only Mode</option>
           <option value="record">Record Only Mode (Studio Full Recitation)</option>
         </select>
+      </div>
+
+      <div class="form-group">
+        <label class="switch-row" for="autoplaySwitch">
+          <span>🔄 Autoplay (Practice Mode)</span>
+          <label class="switch">
+            <input type="checkbox" id="autoplaySwitch" onchange="setAutoplay(this.checked)">
+            <span class="slider"></span>
+          </label>
+        </label>
       </div>
 
       <div class="form-group listen-only">
@@ -854,18 +890,14 @@
 
     const verseIds = [6222, 6223, 6224, 6225];
 
-    function toggleAutoplay() {
-      isAutoplayEnabled = !isAutoplayEnabled;
-      const btn = document.getElementById('autoplayBtn');
-      const status = document.getElementById('autoplayStatus');
+    function setAutoplay(enabled) {
+      isAutoplayEnabled = enabled;
+      const autoSwitch = document.getElementById('autoplaySwitch');
+      if (autoSwitch) autoSwitch.checked = enabled;
 
-      if (isAutoplayEnabled) {
-        btn.classList.add('active');
-        status.textContent = 'ON';
-        showToast('Autoplay Enabled: Waiting 10s after recording to play.');
+      if (enabled) {
+        showToast('Autoplay Enabled: Continuous practice cycle active.');
       } else {
-        btn.classList.remove('active');
-        status.textContent = 'OFF';
         if (autoplayTimer) clearTimeout(autoplayTimer);
         showToast('Autoplay Disabled.');
       }
@@ -1042,7 +1074,11 @@
       showToast('Audio reset complete.');
     }
 
-    window.addEventListener('DOMContentLoaded', initDB);
+    window.addEventListener('DOMContentLoaded', () => {
+      initDB();
+      const autoSwitch = document.getElementById('autoplaySwitch');
+      if (autoSwitch) autoSwitch.checked = isAutoplayEnabled;
+    });
 
     function getQariUrl(verseId) {
       return `https://cdn.islamic.network/quran/audio/128/${activeQariIdentifier}/${verseId}.mp3`;
