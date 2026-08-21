@@ -407,13 +407,13 @@
       background-color: var(--surface);
       color: var(--text-muted);
       border: 1px solid var(--border);
-      padding: 0.65rem 0.85rem;
+      padding: 0.65rem;
     }
 
     .btn-repeat.active {
       background-color: rgba(217, 119, 6, 0.2);
       border-color: var(--accent);
-      color: #fbbf24;
+      color: #f59e0b;
     }
 
     .btn-qiraat {
@@ -681,11 +681,11 @@
         </div>
 
         <div class="controls-row">
-          <button id="ref-btn-1" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6222, 1, this)">
+          <button id="ref-btn-1" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6222, this, 1)">
             ▶ Reference Tilawat
           </button>
-          <button id="repeat-btn-1" class="btn btn-repeat listen-only" onclick="toggleVerseRepeat(1, this)" title="Toggle Verse Repeat">
-            🔁 Repeat
+          <button id="repeat-btn-1" class="btn btn-repeat listen-only" onclick="toggleVerseRepeat(1, this)" title="Repeat Verse">
+            🔁
           </button>
           <button id="rec-btn-1" class="btn btn-record practice-only" onclick="toggleRecord(1, this)">
             🎙 Record Voice
@@ -716,11 +716,11 @@
         </div>
 
         <div class="controls-row">
-          <button id="ref-btn-2" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6223, 2, this)">
+          <button id="ref-btn-2" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6223, this, 2)">
             ▶ Reference Tilawat
           </button>
-          <button id="repeat-btn-2" class="btn btn-repeat listen-only" onclick="toggleVerseRepeat(2, this)" title="Toggle Verse Repeat">
-            🔁 Repeat
+          <button id="repeat-btn-2" class="btn btn-repeat listen-only" onclick="toggleVerseRepeat(2, this)" title="Repeat Verse">
+            🔁
           </button>
           <button id="rec-btn-2" class="btn btn-record practice-only" onclick="toggleRecord(2, this)">
             🎙 Record Voice
@@ -751,11 +751,11 @@
         </div>
 
         <div class="controls-row">
-          <button id="ref-btn-3" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6224, 3, this)">
+          <button id="ref-btn-3" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6224, this, 3)">
             ▶ Reference Tilawat
           </button>
-          <button id="repeat-btn-3" class="btn btn-repeat listen-only" onclick="toggleVerseRepeat(3, this)" title="Toggle Verse Repeat">
-            🔁 Repeat
+          <button id="repeat-btn-3" class="btn btn-repeat listen-only" onclick="toggleVerseRepeat(3, this)" title="Repeat Verse">
+            🔁
           </button>
           <button id="rec-btn-3" class="btn btn-record practice-only" onclick="toggleRecord(3, this)">
             🎙 Record Voice
@@ -786,11 +786,11 @@
         </div>
 
         <div class="controls-row">
-          <button id="ref-btn-4" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6225, 4, this)">
+          <button id="ref-btn-4" class="btn btn-secondary listen-only" onclick="playSingleVerseQiraat(6225, this, 4)">
             ▶ Reference Tilawat
           </button>
-          <button id="repeat-btn-4" class="btn btn-repeat listen-only" onclick="toggleVerseRepeat(4, this)" title="Toggle Verse Repeat">
-            🔁 Repeat
+          <button id="repeat-btn-4" class="btn btn-repeat listen-only" onclick="toggleVerseRepeat(4, this)" title="Repeat Verse">
+            🔁
           </button>
           <button id="rec-btn-4" class="btn btn-record practice-only" onclick="toggleRecord(4, this)">
             🎙 Record Voice
@@ -824,7 +824,7 @@
         <span style="font-weight: 700; color: #2dd4bf; font-size: 0.9rem;">Studio Recitation Recorded</span>
         <audio id="studioAudioPlayback" controls style="width: 100%; border-radius: 8px;"></audio>
         <div style="display: flex; gap: 0.75rem;">
-          <button id="exportStudioMp3Btn" class="btn btn-export" style="flex:1;" onclick="exportStudioMp3()">💾 Export MP3</button>
+          <button class="btn btn-export" style="flex:1;" onclick="exportStudioMp3()">💾 Export MP3</button>
           <button class="btn btn-secondary" onclick="resetStudioRecording()">🗑 Delete & Retry</button>
         </div>
       </div>
@@ -854,7 +854,6 @@
     let isAutoplayEnabled = false;
     let autoplayTimer = null;
     let playbackUpdateFrame = null;
-
     let verseRepeatState = { 1: false, 2: false, 3: false, 4: false };
 
     let mediaRecorder = null;
@@ -880,9 +879,16 @@
       const status = document.getElementById('autoplayStatus');
 
       if (isAutoplayEnabled) {
+        // Disable all verse repeats when turning Autoplay ON
+        for (let i = 1; i <= 4; i++) {
+          verseRepeatState[i] = false;
+          const repeatBtn = document.getElementById(`repeat-btn-${i}`);
+          if (repeatBtn) repeatBtn.classList.remove('active');
+        }
+
         btn.classList.add('active');
         status.textContent = 'ON';
-        showToast('Autoplay Enabled: Waiting 10s after recording to play.');
+        showToast('Autoplay Enabled (Verse Repeats disabled)');
       } else {
         btn.classList.remove('active');
         status.textContent = 'OFF';
@@ -892,10 +898,21 @@
     }
 
     function toggleVerseRepeat(verseNum, btn) {
+      // Enabling repeat disables Autoplay
+      if (!verseRepeatState[verseNum] && isAutoplayEnabled) {
+        isAutoplayEnabled = false;
+        const autoBtn = document.getElementById('autoplayBtn');
+        const autoStatus = document.getElementById('autoplayStatus');
+        if (autoBtn) autoBtn.classList.remove('active');
+        if (autoStatus) autoStatus.textContent = 'OFF';
+        if (autoplayTimer) clearTimeout(autoplayTimer);
+      }
+
       verseRepeatState[verseNum] = !verseRepeatState[verseNum];
+
       if (verseRepeatState[verseNum]) {
         btn.classList.add('active');
-        showToast(`Repeat enabled for Verse ${verseNum}`);
+        showToast(`Repeat enabled for Verse ${verseNum} (Autoplay OFF)`);
       } else {
         btn.classList.remove('active');
         showToast(`Repeat disabled for Verse ${verseNum}`);
@@ -1029,17 +1046,6 @@
           }
         };
       }
-
-      const studioReq = store.get('studioMasterBlob');
-      studioReq.onsuccess = event => {
-        const blob = event.target.result;
-        if (blob) {
-          studioMasterBlob = blob;
-          document.getElementById('studioAudioPlayback').src = URL.createObjectURL(blob);
-          document.getElementById('masterRecordBtn').style.display = 'none';
-          document.getElementById('studioRecordingResult').style.display = 'flex';
-        }
-      };
     }
 
     function clearStorage() {
@@ -1050,7 +1056,6 @@
 
       recordedBlobs = {};
       recordedUrls = {};
-      studioMasterBlob = null;
 
       for (let verseNum = 1; verseNum <= 4; verseNum++) {
         const btn = document.getElementById(`rec-btn-${verseNum}`);
@@ -1061,7 +1066,6 @@
         document.getElementById(`timeline-${verseNum}`).classList.remove('active');
       }
 
-      resetStudioRecording();
       checkFullSurahReady();
       showToast('Audio reset complete.');
     }
@@ -1072,21 +1076,14 @@
       return `https://cdn.islamic.network/quran/audio/128/${activeQariIdentifier}/${verseId}.mp3`;
     }
 
-    function playSingleVerseQiraat(verseId, verseNum, btn) {
+    function playSingleVerseQiraat(verseId, btn, verseNum) {
       const stateKey = `ref-${verseId}`;
 
-      if (currentPlaybackState === stateKey && currentAudio) {
-        if (!isPaused) {
-          currentAudio.pause();
-          isPaused = true;
-          btn.innerHTML = '▶ Resume Tilawat';
-          return;
-        } else {
-          currentAudio.play();
-          isPaused = false;
-          btn.innerHTML = '⏸ Pause Tilawat';
-          return;
-        }
+      if (currentPlaybackState === stateKey && !isPaused && currentAudio) {
+        currentAudio.pause();
+        isPaused = true;
+        btn.innerHTML = '▶ Resume Tilawat';
+        return;
       }
 
       stopAllPlayback(true);
@@ -1098,7 +1095,8 @@
       currentAudio.play();
 
       currentAudio.onended = () => {
-        if (verseRepeatState[verseNum]) {
+        // If repeat is active AND autoplay is OFF, repeat the verse
+        if (verseNum && verseRepeatState[verseNum] && !isAutoplayEnabled) {
           currentAudio.currentTime = 0;
           currentAudio.play();
         } else {
@@ -1138,18 +1136,13 @@
           return;
         }
 
-        const currentVerseNum = currentVerseIndex + 1;
         const url = getQariUrl(verseIds[currentVerseIndex]);
-        qiraatBtn.innerHTML = `⏸ Pause Qira'at (Verse ${currentVerseNum})`;
+        qiraatBtn.innerHTML = `⏸ Pause Qira'at (Verse ${currentVerseIndex + 1})`;
         currentAudio = new Audio(url);
         currentAudio.play();
         currentAudio.onended = () => {
-          if (verseRepeatState[currentVerseNum]) {
-            playNext();
-          } else {
-            currentVerseIndex++;
-            playNext();
-          }
+          currentVerseIndex++;
+          playNext();
         };
       }
       playNext();
@@ -1391,95 +1384,11 @@
       document.getElementById('studioAudioPlayback').src = '';
       document.getElementById('studioRecordingResult').style.display = 'none';
       document.getElementById('masterRecordBtn').style.display = 'block';
-
-      if (db) {
-        const transaction = db.transaction(['recordings'], 'readwrite');
-        transaction.objectStore('recordings').delete('studioMasterBlob');
-      }
-    }
-
-    async function exportStudioMp3() {
-      if (!studioMasterBlob) {
-        showToast('No studio recording found.');
-        return;
-      }
-
-      const btn = document.getElementById('exportStudioMp3Btn');
-      btn.disabled = true;
-      btn.textContent = '⏳ Encoding MP3...';
-      showToast('Encoding MP3, please wait...');
-
-      try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const arrayBuffer = await studioMasterBlob.arrayBuffer();
-        const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-
-        const mp3Blob = await encodeAudioBufferToMp3(audioBuffer);
-        const downloadUrl = URL.createObjectURL(mp3Blob);
-
-        const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.download = 'Surah_Al_Ikhlas_Studio_Recitation.mp3';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        showToast('MP3 exported successfully!');
-      } catch (err) {
-        console.error(err);
-        showToast('Failed to export MP3. Try again.');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = '💾 Export MP3';
-      }
-    }
-
-    function encodeAudioBufferToMp3(audioBuffer) {
-      return new Promise((resolve) => {
-        const channels = audioBuffer.numberOfChannels;
-        const sampleRate = audioBuffer.sampleRate;
-        const mp3encoder = new lamejs.Mp3Encoder(channels, sampleRate, 128);
-        const mp3Data = [];
-
-        const samplesL = audioBuffer.getChannelData(0);
-        const samplesR = channels > 1 ? audioBuffer.getChannelData(1) : samplesL;
-
-        const sampleBlockSize = 1152;
-        const leftInt16 = new Int16Array(sampleBlockSize);
-        const rightInt16 = new Int16Array(sampleBlockSize);
-
-        for (let i = 0; i < samplesL.length; i += sampleBlockSize) {
-          const chunkLength = Math.min(sampleBlockSize, samplesL.length - i);
-
-          for (let j = 0; j < chunkLength; j++) {
-            const sL = Math.max(-1, Math.min(1, samplesL[i + j]));
-            leftInt16[j] = sL < 0 ? sL * 0x8000 : sL * 0x7FFF;
-
-            const sR = Math.max(-1, Math.min(1, samplesR[i + j]));
-            rightInt16[j] = sR < 0 ? sR * 0x8000 : sR * 0x7FFF;
-          }
-
-          let mp3buf;
-          if (channels === 2) {
-            mp3buf = mp3encoder.encodeBuffer(leftInt16.subarray(0, chunkLength), rightInt16.subarray(0, chunkLength));
-          } else {
-            mp3buf = mp3encoder.encodeBuffer(leftInt16.subarray(0, chunkLength));
-          }
-
-          if (mp3buf.length > 0) mp3Data.push(mp3buf);
-        }
-
-        const mp3buf = mp3encoder.flush();
-        if (mp3buf.length > 0) mp3Data.push(mp3buf);
-
-        const mp3Blob = new Blob(mp3Data, { type: 'audio/mp3' });
-        resolve(mp3Blob);
-      });
     }
 
     async function exportToMp3() {
       if (Object.keys(recordedBlobs).length < 4) return;
-      showToast('Exporting practice session MP3...');
+      showToast('Exporting merged MP3...');
     }
   </script>
 </body>
