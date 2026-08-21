@@ -837,6 +837,7 @@
     let isReviewingPhase = false;
     let currentReferenceDuration = 3000; // Default fallback (3 seconds)
     let autoStopRecordingTimer = null;
+    let countdownInterval = null;
 
     let recordedBlobs = {};
     let recordedUrls = {};
@@ -914,6 +915,7 @@
       if (autoplayTimer) clearTimeout(autoplayTimer);
       if (autoStopTimer) clearInterval(autoStopTimer); // Clears countdown interval
       if (autoStopRecordingTimer) clearTimeout(autoStopRecordingTimer); // Clears auto-stop recording timer
+      if (countdownInterval) clearInterval(countdownInterval); // Clears live countdown UI timer
 
       if (currentAudio) {
         currentAudio.pause();
@@ -1129,7 +1131,7 @@
       const stateKey = `user-${verseNum}`;
 
       if (recordingVerse === verseNum && mediaRecorder && mediaRecorder.state === "recording") {
-        if (autoStopRecordingTimer) clearTimeout(autoStopRecordingTimer);
+        clearRecordingTimers();
         mediaRecorder.stop();
         return;
       }
@@ -1166,7 +1168,7 @@
 
         mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
         mediaRecorder.onstop = () => {
-          if (autoStopRecordingTimer) clearTimeout(autoStopRecordingTimer);
+          clearRecordingTimers();
 
           const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
           recordedBlobs[verseNum] = audioBlob;
@@ -1193,10 +1195,23 @@
 
         mediaRecorder.start();
         recordingVerse = verseNum;
-        btn.innerHTML = '🎙 Recording (Auto-stop)...';
         btn.classList.add('recording');
 
-        // Automatically stop recording after the Reference Tilawat duration
+        // Calculate total seconds to record based on reference tilawat
+        let remainingSeconds = Math.ceil(currentReferenceDuration / 1000);
+        btn.innerHTML = `🎙 Recording (${remainingSeconds}s remaining)`;
+
+        // Countdown UI timer
+        countdownInterval = setInterval(() => {
+          remainingSeconds--;
+          if (remainingSeconds > 0) {
+            btn.innerHTML = `🎙 Recording (${remainingSeconds}s remaining)`;
+          } else {
+            btn.innerHTML = `🎙 Finalizing...`;
+          }
+        }, 1000);
+
+        // Auto-stop timeout matching reference tilawat duration
         autoStopRecordingTimer = setTimeout(() => {
           if (mediaRecorder && mediaRecorder.state === "recording") {
             mediaRecorder.stop();
@@ -1205,6 +1220,18 @@
 
       } catch (err) {
         showToast('Microphone access denied.');
+      }
+    }
+
+    // Helper to clear running timers safely
+    function clearRecordingTimers() {
+      if (autoStopRecordingTimer) {
+        clearTimeout(autoStopRecordingTimer);
+        autoStopRecordingTimer = null;
+      }
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
       }
     }
 
