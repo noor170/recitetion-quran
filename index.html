@@ -60,7 +60,8 @@
       padding: 2rem 1.5rem;
       display: flex;
       flex-direction: column;
-      gap: 1.75rem;
+      gap: 1.5rem;
+      position: relative;
     }
 
     /* Header Section */
@@ -70,6 +71,7 @@
       flex-direction: column;
       align-items: center;
       gap: 0.5rem;
+      position: relative;
     }
 
     .badge {
@@ -101,6 +103,128 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-top: 0.5rem;
+    }
+
+    /* Settings Menu Overlay */
+    .settings-btn {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.2s ease;
+    }
+
+    .settings-btn:hover {
+      background: #e2e8f0;
+    }
+
+    .settings-menu {
+      display: none;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      flex-direction: column;
+      gap: 1rem;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+
+    .settings-menu.active {
+      display: flex;
+    }
+
+    .settings-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .form-input, .qari-select {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background-color: var(--surface);
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .form-input:focus, .qari-select:focus {
+      border-color: var(--primary);
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    .checkbox-group input {
+      accent-color: var(--primary);
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    /* Qira'at Banner */
+    .qiraat-banner {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .qiraat-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .qiraat-info span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .qiraat-info strong {
+      font-size: 0.95rem;
+      color: var(--primary);
     }
 
     /* Verse Cards Container */
@@ -203,6 +327,20 @@
       background-color: #e2e8f0;
     }
 
+    .btn-qiraat {
+      background-color: var(--accent);
+      color: white;
+      white-space: nowrap;
+    }
+
+    .btn-qiraat:hover {
+      background-color: #b45309;
+    }
+
+    .btn-qiraat.playing {
+      background-color: var(--danger);
+    }
+
     .btn-record {
       background-color: var(--primary);
       color: #ffffff;
@@ -245,6 +383,10 @@
 
     .btn-primary:hover:not(:disabled) {
       background-color: #2563eb;
+    }
+
+    .btn-primary.playing {
+      background-color: var(--danger);
     }
 
     .btn-export {
@@ -304,6 +446,11 @@
       100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
     }
 
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     @media (max-width: 480px) {
       body {
         padding: 0.75rem 0.5rem;
@@ -311,7 +458,7 @@
       .app-card {
         padding: 1.25rem 1rem;
       }
-      .controls-row {
+      .controls-row, .qiraat-banner {
         flex-direction: column;
       }
     }
@@ -322,10 +469,56 @@
   <div class="app-card">
     <!-- Header -->
     <header class="header">
+      <button class="settings-btn" onclick="toggleSettingsMenu()" title="Qari Settings">⚙️</button>
       <span class="badge">Chapter 112 • Al-Ikhlas</span>
       <h1>Surah Al-Ikhlas</h1>
       <div class="bismillah">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
     </header>
+
+    <!-- Settings Menu Dropdown -->
+    <div id="settingsMenu" class="settings-menu">
+      <div class="settings-title">
+        <span>⚙️ Qira'at Settings</span>
+        <button style="background:none; border:none; cursor:pointer;" onclick="toggleSettingsMenu()">❌</button>
+      </div>
+
+      <!-- Select Preset Qari -->
+      <div class="form-group">
+        <label for="qariSelect">Select Preferred Qari:</label>
+        <select id="qariSelect" class="qari-select" onchange="updateSelectedQari()">
+          <option value="ar.alafasy">Mishary Rashid Alafasy</option>
+          <option value="ar.husary">Mahmoud Khalil Al-Husary</option>
+          <option value="ar.minshawi">Mohamed Siddiq El-Minshawi</option>
+          <option value="custom">-- Custom Favorite Qari --</option>
+        </select>
+      </div>
+
+      <!-- Favorite Qari Custom Field -->
+      <div class="form-group" id="customQariContainer">
+        <label for="customQariInput">Favorite Qari API Identifier:</label>
+        <div style="display: flex; gap: 0.5rem;">
+          <input type="text" id="customQariInput" class="form-input" placeholder="e.g., ar.alafasy or ar.parhizgar">
+          <button class="btn btn-secondary" style="flex:0; white-space:nowrap;" onclick="saveFavoriteQari()">Save</button>
+        </div>
+      </div>
+
+      <!-- Auto-Play Setting -->
+      <label class="checkbox-group">
+        <input type="checkbox" id="autoPlayFavToggle">
+        Auto-play Qira'at when Qari is selected
+      </label>
+    </div>
+
+    <!-- Active Qari Banner -->
+    <section class="qiraat-banner">
+      <div class="qiraat-info">
+        <span>Active Reference Qari</span>
+        <strong id="activeQariLabel">Mishary Rashid Alafasy</strong>
+      </div>
+      <button id="qiraatPlayBtn" class="btn btn-qiraat" onclick="toggleContinuousQiraat()">
+        ▶ Play Full Qira'at
+      </button>
+    </section>
 
     <!-- Verses Container -->
     <main class="verse-list">
@@ -341,7 +534,7 @@
           <div class="translation">Say, "He is Allah, [who is] One,"</div>
         </div>
         <div class="controls-row">
-          <button class="btn btn-secondary" onclick="playAudio('https://cdn.islamic.network/quran/audio/128/ar.alafasy/6222.mp3')">
+          <button id="ref-btn-1" class="btn btn-secondary" onclick="playSingleVerseQiraat(6222, this)">
             ▶ Reference Tilawat
           </button>
           <button id="rec-btn-1" class="btn btn-record" onclick="toggleRecord(1, this)">
@@ -361,7 +554,7 @@
           <div class="translation">"Allah, the Eternal Refuge."</div>
         </div>
         <div class="controls-row">
-          <button class="btn btn-secondary" onclick="playAudio('https://cdn.islamic.network/quran/audio/128/ar.alafasy/6223.mp3')">
+          <button id="ref-btn-2" class="btn btn-secondary" onclick="playSingleVerseQiraat(6223, this)">
             ▶ Reference Tilawat
           </button>
           <button id="rec-btn-2" class="btn btn-record" onclick="toggleRecord(2, this)">
@@ -381,7 +574,7 @@
           <div class="translation">"He neither begets nor is born,"</div>
         </div>
         <div class="controls-row">
-          <button class="btn btn-secondary" onclick="playAudio('https://cdn.islamic.network/quran/audio/128/ar.alafasy/6224.mp3')">
+          <button id="ref-btn-3" class="btn btn-secondary" onclick="playSingleVerseQiraat(6224, this)">
             ▶ Reference Tilawat
           </button>
           <button id="rec-btn-3" class="btn btn-record" onclick="toggleRecord(3, this)">
@@ -401,7 +594,7 @@
           <div class="translation">"Nor is there to Him any equivalent."</div>
         </div>
         <div class="controls-row">
-          <button class="btn btn-secondary" onclick="playAudio('https://cdn.islamic.network/quran/audio/128/ar.alafasy/6225.mp3')">
+          <button id="ref-btn-4" class="btn btn-secondary" onclick="playSingleVerseQiraat(6225, this)">
             ▶ Reference Tilawat
           </button>
           <button id="rec-btn-4" class="btn btn-record" onclick="toggleRecord(4, this)">
@@ -415,8 +608,8 @@
     <!-- Global Controls -->
     <footer class="actions-footer">
       <div class="btn-group">
-        <button id="fullPlayBtn" class="btn btn-primary" disabled onclick="playFullSurah()">
-          ▶ Play Full Recitation
+        <button id="fullPlayBtn" class="btn btn-primary" disabled onclick="toggleFullSurah()">
+          ▶ Play Full Personal Recitation
         </button>
         <button id="saveMp3Btn" class="btn btn-export" disabled onclick="exportToMp3()">
           💾 Export MP3
@@ -434,6 +627,11 @@
 
   <script>
     let currentAudio = null;
+    let currentPlaybackState = null;
+    let isPaused = false;
+    let currentVerseIndex = 0;
+    let activeQariIdentifier = 'ar.alafasy';
+    
     let mediaRecorder = null;
     let audioChunks = [];
     let recordingVerse = null;
@@ -442,12 +640,106 @@
     let recordedUrls = {};
     let db = null;
 
-    // Custom UI Toast Notification
+    const verseIds = [6222, 6223, 6224, 6225];
+
+    function toggleSettingsMenu() {
+      const menu = document.getElementById('settingsMenu');
+      menu.classList.toggle('active');
+    }
+
+    // Handles dropdown Qari selection and auto-play
+    function updateSelectedQari() {
+      stopAllPlayback(true);
+      const select = document.getElementById('qariSelect');
+
+      if (select.value === 'custom') {
+        const customVal = document.getElementById('customQariInput').value.trim();
+        if (customVal) {
+          activeQariIdentifier = customVal;
+          document.getElementById('activeQariLabel').textContent = customVal;
+        } else {
+          showToast('Please enter a custom favorite Qari identifier.');
+          return;
+        }
+      } else {
+        activeQariIdentifier = select.value;
+        const selectedName = select.options[select.selectedIndex].text;
+        document.getElementById('activeQariLabel').textContent = selectedName;
+      }
+
+      showToast(`Selected Qari: ${activeQariIdentifier}`);
+
+      // Auto-Play Feature
+      if (document.getElementById('autoPlayFavToggle').checked) {
+        setTimeout(() => toggleContinuousQiraat(), 300);
+      }
+    }
+
+    // Saves custom favorite Qari identifier
+    function saveFavoriteQari() {
+      const customInput = document.getElementById('customQariInput').value.trim();
+      if (!customInput) {
+        showToast('Please enter a valid Qari identifier.');
+        return;
+      }
+
+      activeQariIdentifier = customInput;
+      document.getElementById('qariSelect').value = 'custom';
+      document.getElementById('activeQariLabel').textContent = customInput;
+      showToast(`Favorite Qari saved: ${customInput}`);
+
+      if (document.getElementById('autoPlayFavToggle').checked) {
+        stopAllPlayback(true);
+        setTimeout(() => toggleContinuousQiraat(), 300);
+      }
+    }
+
     function showToast(message) {
       const toast = document.getElementById('toast');
       toast.textContent = message;
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    function stopAllPlayback(resetPosition = false) {
+      if (currentAudio) {
+        currentAudio.pause();
+        if (resetPosition) {
+          currentAudio = null;
+        }
+      }
+
+      if (resetPosition) {
+        currentAudio = null;
+        currentPlaybackState = null;
+        isPaused = false;
+        currentVerseIndex = 0;
+      }
+
+      const qiraatBtn = document.getElementById('qiraatPlayBtn');
+      if (qiraatBtn) {
+        qiraatBtn.innerHTML = (currentPlaybackState === 'fullQiraat' && isPaused) ? '▶ Resume Qira\'at' : '▶ Play Full Qira\'at';
+        qiraatBtn.classList.remove('playing');
+      }
+
+      const fullPlayBtn = document.getElementById('fullPlayBtn');
+      if (fullPlayBtn) {
+        fullPlayBtn.innerHTML = (currentPlaybackState === 'fullPersonal' && isPaused) ? '▶ Resume Personal' : '▶ Play Full Personal Recitation';
+        fullPlayBtn.classList.remove('playing');
+      }
+
+      for (let i = 1; i <= 4; i++) {
+        const refBtn = document.getElementById(`ref-btn-${i}`);
+        if (refBtn) {
+          const verseId = verseIds[i - 1];
+          refBtn.innerHTML = (currentPlaybackState === `ref-${verseId}` && isPaused) ? '▶ Resume Tilawat' : '▶ Reference Tilawat';
+        }
+
+        const recBtn = document.getElementById(`rec-btn-${i}`);
+        if (recBtn && recordedUrls[i]) {
+          recBtn.innerHTML = (currentPlaybackState === `user-${i}` && isPaused) ? '▶ Resume Voice' : '🔊 Listen Back';
+        }
+      }
     }
 
     // --- INDEXEDDB SETUP FOR PERSISTENT STORAGE ---
@@ -507,6 +799,7 @@
     }
 
     function clearStorage() {
+      stopAllPlayback(true);
       if (!db) return;
       const transaction = db.transaction(['recordings'], 'readwrite');
       const store = transaction.objectStore('recordings');
@@ -529,30 +822,138 @@
 
     window.addEventListener('DOMContentLoaded', initDB);
 
-    function playAudio(url) {
-      if (currentAudio) {
-        currentAudio.pause();
-      }
-      currentAudio = new Audio(url);
-      currentAudio.play();
+    // --- QIRA'AT MODE REFERENCE PLAYER ---
+    function getQariUrl(verseId) {
+      return `https://cdn.islamic.network/quran/audio/128/${activeQariIdentifier}/${verseId}.mp3`;
     }
 
-    // --- TOGGLE RECORD WITH DETAILED PERMISSION HANDLER ---
+    function playSingleVerseQiraat(verseId, btn) {
+      const stateKey = `ref-${verseId}`;
+
+      if (currentPlaybackState === stateKey && !isPaused && currentAudio) {
+        currentAudio.pause();
+        isPaused = true;
+        btn.innerHTML = '▶ Resume Tilawat';
+        return;
+      }
+
+      if (currentPlaybackState === stateKey && isPaused && currentAudio) {
+        isPaused = false;
+        btn.innerHTML = '⏸ Pause Tilawat';
+        currentAudio.play();
+        return;
+      }
+
+      stopAllPlayback(true);
+      currentPlaybackState = stateKey;
+      isPaused = false;
+
+      const url = getQariUrl(verseId);
+      currentAudio = new Audio(url);
+      btn.innerHTML = '⏸ Pause Tilawat';
+
+      currentAudio.play();
+      currentAudio.onended = () => {
+        stopAllPlayback(true);
+      };
+      currentAudio.onerror = () => {
+        showToast('Failed to load recitation audio for selected Qari.');
+        stopAllPlayback(true);
+      };
+    }
+
+    function toggleContinuousQiraat() {
+      const qiraatBtn = document.getElementById('qiraatPlayBtn');
+
+      if (currentPlaybackState === 'fullQiraat' && !isPaused && currentAudio) {
+        currentAudio.pause();
+        isPaused = true;
+        qiraatBtn.innerHTML = `▶ Resume Qira'at (Verse ${currentVerseIndex + 1})`;
+        qiraatBtn.classList.remove('playing');
+        return;
+      }
+
+      if (currentPlaybackState === 'fullQiraat' && isPaused && currentAudio) {
+        isPaused = false;
+        qiraatBtn.innerHTML = `⏸ Pause Qira'at (Verse ${currentVerseIndex + 1})`;
+        qiraatBtn.classList.add('playing');
+        currentAudio.play();
+        return;
+      }
+
+      stopAllPlayback(true);
+      currentPlaybackState = 'fullQiraat';
+      isPaused = false;
+      currentVerseIndex = 0;
+      qiraatBtn.classList.add('playing');
+
+      function playNext() {
+        if (currentVerseIndex >= verseIds.length || currentPlaybackState !== 'fullQiraat') {
+          stopAllPlayback(true);
+          return;
+        }
+
+        const verseId = verseIds[currentVerseIndex];
+        const url = getQariUrl(verseId);
+        
+        qiraatBtn.innerHTML = `⏸ Pause Qira'at (Verse ${currentVerseIndex + 1})`;
+        currentAudio = new Audio(url);
+        currentAudio.play();
+
+        currentAudio.onended = () => {
+          currentVerseIndex++;
+          playNext();
+        };
+
+        currentAudio.onerror = () => {
+          showToast('Failed to load recitation audio.');
+          stopAllPlayback(true);
+        };
+      }
+
+      playNext();
+    }
+
+    // --- RECORDING & PERSONAL PLAYBACK HANDLERS ---
     async function toggleRecord(verseNum, btn) {
-      // Stop ongoing recording
+      const stateKey = `user-${verseNum}`;
+
       if (recordingVerse === verseNum && mediaRecorder && mediaRecorder.state === "recording") {
         mediaRecorder.stop();
         return;
       }
 
-      // Play existing recording
       if (recordedUrls[verseNum] && !btn.classList.contains('recording')) {
-        playAudio(recordedUrls[verseNum]);
+        if (currentPlaybackState === stateKey && !isPaused && currentAudio) {
+          currentAudio.pause();
+          isPaused = true;
+          btn.innerHTML = '▶ Resume Voice';
+          return;
+        }
+
+        if (currentPlaybackState === stateKey && isPaused && currentAudio) {
+          isPaused = false;
+          btn.innerHTML = '⏸ Pause Voice';
+          currentAudio.play();
+          return;
+        }
+
+        stopAllPlayback(true);
+        currentPlaybackState = stateKey;
+        isPaused = false;
+        
+        currentAudio = new Audio(recordedUrls[verseNum]);
+        btn.innerHTML = '⏸ Pause Voice';
+        currentAudio.play();
+
+        currentAudio.onended = () => {
+          stopAllPlayback(true);
+        };
         return;
       }
 
-      // Request microphone stream with try-catch
       try {
+        stopAllPlayback(true);
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(stream);
         audioChunks = [];
@@ -611,24 +1012,41 @@
       }
     }
 
-    function playFullSurah() {
+    function toggleFullSurah() {
       if (Object.keys(recordedBlobs).length < 4) return;
 
-      let currentVerseIndex = 1;
       const fullPlayBtn = document.getElementById('fullPlayBtn');
-      
-      if (currentAudio) {
+
+      if (currentPlaybackState === 'fullPersonal' && !isPaused && currentAudio) {
         currentAudio.pause();
+        isPaused = true;
+        fullPlayBtn.innerHTML = `▶ Resume Personal (Verse ${currentVerseIndex})`;
+        fullPlayBtn.classList.remove('playing');
+        return;
       }
 
+      if (currentPlaybackState === 'fullPersonal' && isPaused && currentAudio) {
+        isPaused = false;
+        fullPlayBtn.innerHTML = `⏸ Pause Personal (Verse ${currentVerseIndex})`;
+        fullPlayBtn.classList.add('playing');
+        currentAudio.play();
+        return;
+      }
+
+      stopAllPlayback(true);
+      currentPlaybackState = 'fullPersonal';
+      isPaused = false;
+      currentVerseIndex = 1;
+      fullPlayBtn.classList.add('playing');
+
       function playNextVerse() {
-        if (currentVerseIndex > 4) {
-          fullPlayBtn.innerHTML = '▶ Play Full Recitation';
+        if (currentVerseIndex > 4 || currentPlaybackState !== 'fullPersonal') {
+          stopAllPlayback(true);
           checkFullSurahReady();
           return;
         }
 
-        fullPlayBtn.innerHTML = `⏸ Playing Verse ${currentVerseIndex}...`;
+        fullPlayBtn.innerHTML = `⏸ Pause Personal (Verse ${currentVerseIndex})`;
         currentAudio = new Audio(recordedUrls[currentVerseIndex]);
         currentAudio.play();
 
@@ -643,6 +1061,7 @@
 
     async function exportToMp3() {
       if (Object.keys(recordedBlobs).length < 4) return;
+      stopAllPlayback(true);
 
       const statusMsg = document.getElementById('statusMsg');
       statusMsg.textContent = 'Encoding full Surah to MP3 format...';
