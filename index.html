@@ -832,9 +832,11 @@
     let mediaRecorder = null;
     let audioChunks = [];
     let recordingVerse = null;
+    let autoStopTimer = null;
 
     let recordedBlobs = {};
     let recordedUrls = {};
+    let referenceDurations = {}; // Store duration for each reference verse
     let db = null;
 
     let studioAudioCtx = null;
@@ -906,6 +908,7 @@
     function stopAllPlayback(resetPosition = false) {
       if (playbackUpdateFrame) cancelAnimationFrame(playbackUpdateFrame);
       if (autoplayTimer) clearTimeout(autoplayTimer);
+      if (autoStopTimer) clearTimeout(autoStopTimer);
 
       if (currentAudio) {
         currentAudio.pause();
@@ -1050,14 +1053,21 @@
 
       currentAudio = new Audio(getQariUrl(verseId));
       btn.innerHTML = '⏸ Pause Tilawat';
+
+      // Capture audio metadata length dynamically
+      currentAudio.onloadedmetadata = () => {
+        referenceDurations[verseNum] = currentAudio.duration;
+      };
+
       currentAudio.play();
 
-      // Auto-trigger recording for this verse once reference audio ends
       currentAudio.onended = () => {
         stopAllPlayback(true);
         const recBtn = document.getElementById(`rec-btn-${verseNum}`);
         if (recBtn) {
-          toggleRecord(verseNum, recBtn);
+          // Auto start recording with strict timer based on audio duration
+          const duration = referenceDurations[verseNum] || currentAudio.duration || 5;
+          toggleRecord(verseNum, recBtn, duration);
         }
       };
     }
@@ -1105,11 +1115,12 @@
       playNext();
     }
 
-    async function toggleRecord(verseNum, btn) {
+    async function toggleRecord(verseNum, btn, durationLimit = null) {
       const stateKey = `user-${verseNum}`;
 
       if (recordingVerse === verseNum && mediaRecorder && mediaRecorder.state === "recording") {
         mediaRecorder.stop();
+        if (autoStopTimer) clearTimeout(autoStopTimer);
         return;
       }
 
@@ -1146,6 +1157,7 @@
 
         mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
         mediaRecorder.onstop = () => {
+          if (autoStopTimer) clearTimeout(autoStopTimer);
           const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
           recordedBlobs[verseNum] = audioBlob;
           recordedUrls[verseNum] = URL.createObjectURL(audioBlob);
@@ -1161,7 +1173,7 @@
           checkFullSurahReady();
           stream.getTracks().forEach(track => track.stop());
 
-          // AUTO-ADVANCE: Move to the next verse's reference tilawat if available
+          // Auto continuation flow to next reference verse
           const nextVerseNum = verseNum + 1;
           if (nextVerseNum <= verseIds.length) {
             showToast(`Verse ${verseNum} complete! Moving to Verse ${nextVerseNum}...`);
@@ -1171,7 +1183,7 @@
               if (nextRefBtn) {
                 playSingleVerseQiraat(nextVerseId, nextRefBtn);
               }
-            }, 1500); // 1.5 second pause between verse transitions
+            }, 1500);
           } else {
             showToast('All verses completed!');
           }
@@ -1179,8 +1191,18 @@
 
         mediaRecorder.start();
         recordingVerse = verseNum;
-        btn.innerHTML = '⏹ Stop Recording';
+        btn.innerHTML = '🎙 Recording (Auto-Stop)...';
         btn.classList.add('recording');
+
+        // Automatically call stop recording based on exact reference tilawat duration
+        if (durationLimit) {
+          const timeoutMs = durationLimit * 1000;
+          autoStopTimer = setTimeout(() => {
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+              mediaRecorder.stop();
+            }
+          }, timeoutMs);
+        }
       } catch (err) {
         showToast('Microphone access denied.');
       }
