@@ -442,6 +442,49 @@
       color: #ffffff;
     }
 
+    .loop-controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .btn-loop {
+      flex: 0 0 auto;
+      background-color: var(--surface);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.85rem;
+      font-size: 0.8rem;
+    }
+
+    .btn-loop.active {
+      background-color: rgba(217, 119, 6, 0.2);
+      border-color: var(--accent);
+      color: #f59e0b;
+    }
+
+    .loop-time {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .loop-time input {
+      width: 60px;
+      padding: 0.35rem 0.5rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background-color: var(--surface);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.8rem;
+      outline: none;
+    }
+
     .btn-record.recording {
       background-color: var(--danger);
       animation: pulse-red 1.5s infinite;
@@ -755,6 +798,7 @@
     let currentReferenceDuration = 3000; // Default fallback (3 seconds)
     let autoStopRecordingTimer = null;
     let countdownInterval = null;
+    let loopConfig = {}; // verseNum -> { active, start, end } for A/B micro-loop rehearse
 
     let recordedBlobs = {};
     let recordedUrls = {};
@@ -1049,6 +1093,14 @@
           <div class="translation">${verseTranslation[v]}</div>
         </div>
 
+        <div class="loop-controls">
+          <button id="loop-btn-${v}" class="btn btn-loop" onclick="toggleLoopVerse(${v}, this)" title="Loop a section to rehearse">
+            🔁 Loop Verse
+          </button>
+          <label class="loop-time">A <input type="number" id="loop-start-${v}" min="0" step="0.5" value="0" onchange="updateLoopTiming(${v})"></label>
+          <label class="loop-time">B <input type="number" id="loop-end-${v}" min="0" step="0.5" value="0" onchange="updateLoopTiming(${v})"></label>
+        </div>
+
         <div id="timeline-${v}" class="timeline-container practice-only">
           <div class="timeline-meta">
             <span>Visual Backtracking Timeline</span>
@@ -1104,6 +1156,8 @@
           currentReferenceDuration = currentAudio.duration * 1000;
         }
       };
+
+      currentAudio.ontimeupdate = () => handleLoopTimeUpdate(verseNum);
 
       currentAudio.play();
 
@@ -1194,6 +1248,14 @@
 
       try {
         stopAllPlayback(true);
+
+        // Disable the A/B micro-loop so the take is captured over the full track
+        if (loopConfig[verseNum] && loopConfig[verseNum].active) {
+          loopConfig[verseNum].active = false;
+          const loopBtn = document.getElementById(`loop-btn-${verseNum}`);
+          if (loopBtn) loopBtn.classList.remove('active');
+        }
+
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(stream);
         audioChunks = [];
@@ -1306,12 +1368,54 @@
         }
       };
 
+      currentAudio.ontimeupdate = () => handleLoopTimeUpdate(verseNum);
+
       currentAudio.play();
 
       currentAudio.onended = () => {
         if (btn) btn.innerHTML = '▶ Reference Tilawat';
         if (onCompleteCallback) onCompleteCallback();
       };
+    }
+
+    // A/B Micro-Loop: toggle rehearsal looping for a verse's reference track
+    function toggleLoopVerse(verseNum, btn) {
+      if (!loopConfig[verseNum]) loopConfig[verseNum] = { active: false, start: 0, end: 0 };
+      loopConfig[verseNum].active = !loopConfig[verseNum].active;
+      btn.classList.toggle('active', loopConfig[verseNum].active);
+
+      if (loopConfig[verseNum].active) {
+        // Start the reference playback (loop applies while it plays)
+        const refBtn = document.getElementById(`ref-btn-${verseNum}`);
+        if (refBtn) playSingleVerseQiraat(verseNum, refBtn);
+        showToast(`Loop Verse ${verseNum} ON — rehearsing section.`);
+      } else {
+        showToast(`Loop Verse ${verseNum} OFF — resuming full playback.`);
+      }
+    }
+
+    function updateLoopTiming(verseNum) {
+      const startEl = document.getElementById(`loop-start-${verseNum}`);
+      const endEl = document.getElementById(`loop-end-${verseNum}`);
+      const start = parseFloat(startEl && startEl.value) || 0;
+      const end = parseFloat(endEl && endEl.value) || 0;
+      if (!loopConfig[verseNum]) loopConfig[verseNum] = { active: false, start: 0, end: 0 };
+      loopConfig[verseNum].start = start;
+      loopConfig[verseNum].end = end;
+    }
+
+    function handleLoopTimeUpdate(verseNum) {
+      if (!currentAudio || currentPlaybackState !== `ref-${verseNum}`) return;
+      const cfg = loopConfig[verseNum];
+      if (!cfg || !cfg.active) return;
+
+      const end = cfg.end > 0 ? cfg.end : (currentAudio.duration || 0);
+      const start = cfg.start || 0;
+
+      // Reset playhead to start when reaching the loop end (A/B micro-loop)
+      if (currentAudio.currentTime >= end) {
+        currentAudio.currentTime = start;
+      }
     }
 
     // 4. Automated Practice Cycle Controller
