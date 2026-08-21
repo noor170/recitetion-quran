@@ -824,7 +824,7 @@
         <span style="font-weight: 700; color: #2dd4bf; font-size: 0.9rem;">Studio Recitation Recorded</span>
         <audio id="studioAudioPlayback" controls style="width: 100%; border-radius: 8px;"></audio>
         <div style="display: flex; gap: 0.75rem;">
-          <button class="btn btn-export" style="flex:1;" onclick="exportStudioMp3()">💾 Export MP3</button>
+          <button id="exportStudioMp3Btn" class="btn btn-export" style="flex:1;" onclick="exportStudioMp3()">💾 Export MP3</button>
           <button class="btn btn-secondary" onclick="resetStudioRecording()">🗑 Delete & Retry</button>
         </div>
       </div>
@@ -1029,6 +1029,17 @@
           }
         };
       }
+
+      const studioReq = store.get('studioMasterBlob');
+      studioReq.onsuccess = event => {
+        const blob = event.target.result;
+        if (blob) {
+          studioMasterBlob = blob;
+          document.getElementById('studioAudioPlayback').src = URL.createObjectURL(blob);
+          document.getElementById('masterRecordBtn').style.display = 'none';
+          document.getElementById('studioRecordingResult').style.display = 'flex';
+        }
+      };
     }
 
     function clearStorage() {
@@ -1039,6 +1050,7 @@
 
       recordedBlobs = {};
       recordedUrls = {};
+      studioMasterBlob = null;
 
       for (let verseNum = 1; verseNum <= 4; verseNum++) {
         const btn = document.getElementById(`rec-btn-${verseNum}`);
@@ -1049,6 +1061,7 @@
         document.getElementById(`timeline-${verseNum}`).classList.remove('active');
       }
 
+      resetStudioRecording();
       checkFullSurahReady();
       showToast('Audio reset complete.');
     }
@@ -1083,7 +1096,7 @@
       currentAudio = new Audio(getQariUrl(verseId));
       btn.innerHTML = '⏸ Pause Tilawat';
       currentAudio.play();
-      
+
       currentAudio.onended = () => {
         if (verseRepeatState[verseNum]) {
           currentAudio.currentTime = 0;
@@ -1378,11 +1391,95 @@
       document.getElementById('studioAudioPlayback').src = '';
       document.getElementById('studioRecordingResult').style.display = 'none';
       document.getElementById('masterRecordBtn').style.display = 'block';
+
+      if (db) {
+        const transaction = db.transaction(['recordings'], 'readwrite');
+        transaction.objectStore('recordings').delete('studioMasterBlob');
+      }
+    }
+
+    async function exportStudioMp3() {
+      if (!studioMasterBlob) {
+        showToast('No studio recording found.');
+        return;
+      }
+
+      const btn = document.getElementById('exportStudioMp3Btn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Encoding MP3...';
+      showToast('Encoding MP3, please wait...');
+
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const arrayBuffer = await studioMasterBlob.arrayBuffer();
+        const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+        const mp3Blob = await encodeAudioBufferToMp3(audioBuffer);
+        const downloadUrl = URL.createObjectURL(mp3Blob);
+
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = 'Surah_Al_Ikhlas_Studio_Recitation.mp3';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        showToast('MP3 exported successfully!');
+      } catch (err) {
+        console.error(err);
+        showToast('Failed to export MP3. Try again.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 Export MP3';
+      }
+    }
+
+    function encodeAudioBufferToMp3(audioBuffer) {
+      return new Promise((resolve) => {
+        const channels = audioBuffer.numberOfChannels;
+        const sampleRate = audioBuffer.sampleRate;
+        const mp3encoder = new lamejs.Mp3Encoder(channels, sampleRate, 128);
+        const mp3Data = [];
+
+        const samplesL = audioBuffer.getChannelData(0);
+        const samplesR = channels > 1 ? audioBuffer.getChannelData(1) : samplesL;
+
+        const sampleBlockSize = 1152;
+        const leftInt16 = new Int16Array(sampleBlockSize);
+        const rightInt16 = new Int16Array(sampleBlockSize);
+
+        for (let i = 0; i < samplesL.length; i += sampleBlockSize) {
+          const chunkLength = Math.min(sampleBlockSize, samplesL.length - i);
+
+          for (let j = 0; j < chunkLength; j++) {
+            const sL = Math.max(-1, Math.min(1, samplesL[i + j]));
+            leftInt16[j] = sL < 0 ? sL * 0x8000 : sL * 0x7FFF;
+
+            const sR = Math.max(-1, Math.min(1, samplesR[i + j]));
+            rightInt16[j] = sR < 0 ? sR * 0x8000 : sR * 0x7FFF;
+          }
+
+          let mp3buf;
+          if (channels === 2) {
+            mp3buf = mp3encoder.encodeBuffer(leftInt16.subarray(0, chunkLength), rightInt16.subarray(0, chunkLength));
+          } else {
+            mp3buf = mp3encoder.encodeBuffer(leftInt16.subarray(0, chunkLength));
+          }
+
+          if (mp3buf.length > 0) mp3Data.push(mp3buf);
+        }
+
+        const mp3buf = mp3encoder.flush();
+        if (mp3buf.length > 0) mp3Data.push(mp3buf);
+
+        const mp3Blob = new Blob(mp3Data, { type: 'audio/mp3' });
+        resolve(mp3Blob);
+      });
     }
 
     async function exportToMp3() {
       if (Object.keys(recordedBlobs).length < 4) return;
-      showToast('Exporting merged MP3...');
+      showToast('Exporting practice session MP3...');
     }
   </script>
 </body>
