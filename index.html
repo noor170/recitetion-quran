@@ -833,6 +833,8 @@
     let audioChunks = [];
     let recordingVerse = null;
     let autoStopTimer = null;
+    let currentAutoplayVerse = 1;
+    let isReviewingPhase = false;
 
     let recordedBlobs = {};
     let recordedUrls = {};
@@ -1120,12 +1122,11 @@
       playNext();
     }
 
-    async function toggleRecord(verseNum, btn, durationLimit = null) {
+    async function toggleRecord(verseNum, btn) {
       const stateKey = `user-${verseNum}`;
 
       if (recordingVerse === verseNum && mediaRecorder && mediaRecorder.state === "recording") {
         mediaRecorder.stop();
-        if (autoStopTimer) clearInterval(autoStopTimer);
         return;
       }
 
@@ -1144,7 +1145,6 @@
         currentAudio = new Audio(recordedUrls[verseNum]);
         btn.innerHTML = '⏸ Pause Voice';
         currentAudio.play();
-
         trackTimelineProgress(verseNum);
 
         currentAudio.onended = () => {
@@ -1162,7 +1162,6 @@
 
         mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
         mediaRecorder.onstop = () => {
-          if (autoStopTimer) clearInterval(autoStopTimer);
           const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
           recordedBlobs[verseNum] = audioBlob;
           recordedUrls[verseNum] = URL.createObjectURL(audioBlob);
@@ -1178,52 +1177,115 @@
           checkFullSurahReady();
           stream.getTracks().forEach(track => track.stop());
 
-          // AUTOPLAY CONTROL: Only advance to the next verse if Autoplay is switched ON
+          // Branch execution based on Autoplay state
           if (isAutoplayEnabled) {
-            const nextVerseNum = verseNum + 1;
-            if (nextVerseNum <= verseIds.length) {
-              showToast(`Verse ${verseNum} complete! Moving to Verse ${nextVerseNum}...`);
-              setTimeout(() => {
-                const nextRefBtn = document.getElementById(`ref-btn-${nextVerseNum}`);
-                const nextVerseId = verseIds[nextVerseNum - 1];
-                if (nextRefBtn) {
-                  playSingleVerseQiraat(nextVerseId, nextRefBtn);
-                }
-              }, 1500);
-            } else {
-              showToast('All verses completed!');
-            }
+            currentAutoplayVerse = verseNum + 1;
+            setTimeout(runAutoplayLoop, 1000);
           } else {
-            showToast(`Verse ${verseNum} recorded. (Autoplay is OFF)`);
+            // AUTOPLAY OFF: Playback recorded audio immediately
+            playRecordedVoice(verseNum);
           }
         };
 
         mediaRecorder.start();
         recordingVerse = verseNum;
+        btn.innerHTML = '⏹ Stop Recording';
         btn.classList.add('recording');
-
-        // Handle timer display & automatic stopping logic
-        if (durationLimit) {
-          let remainingSeconds = Math.ceil(durationLimit);
-          btn.innerHTML = `🎙 Recording (${remainingSeconds}s remaining)`;
-
-          autoStopTimer = setInterval(() => {
-            remainingSeconds--;
-            if (remainingSeconds > 0) {
-              btn.innerHTML = `🎙 Recording (${remainingSeconds}s remaining)`;
-            } else {
-              clearInterval(autoStopTimer);
-              if (mediaRecorder && mediaRecorder.state === "recording") {
-                mediaRecorder.stop();
-              }
-            }
-          }, 1000);
-        } else {
-          btn.innerHTML = '⏹ Stop Recording';
-        }
       } catch (err) {
         showToast('Microphone access denied.');
       }
+    }
+
+    // 2. Play single recorded voice
+    function playRecordedVoice(verseNum, onCompleteCallback) {
+      if (!recordedUrls[verseNum]) return;
+
+      stopAllPlayback(true);
+      currentPlaybackState = `user-${verseNum}`;
+
+      const btn = document.getElementById(`rec-btn-${verseNum}`);
+      if (btn) btn.innerHTML = '⏸ Voice Recording';
+
+      currentAudio = new Audio(recordedUrls[verseNum]);
+      currentAudio.play();
+      trackTimelineProgress(verseNum);
+
+      currentAudio.onended = () => {
+        resetTimelineScrubber(verseNum);
+        if (btn) btn.innerHTML = '🔊 Listen Back';
+        if (onCompleteCallback) onCompleteCallback();
+      };
+    }
+
+    // 3. Play Reference Tilawat with callback hook
+    function playReferenceVerse(verseNum, onCompleteCallback) {
+      const verseId = verseIds[verseNum - 1];
+      stopAllPlayback(true);
+      currentPlaybackState = `ref-${verseId}`;
+
+      const btn = document.getElementById(`ref-btn-${verseNum}`);
+      if (btn) btn.innerHTML = '⏸ Reference Tilawat';
+
+      currentAudio = new Audio(getQariUrl(verseId));
+      currentAudio.play();
+
+      currentAudio.onended = () => {
+        if (btn) btn.innerHTML = '▶ Reference Tilawat';
+        if (onCompleteCallback) onCompleteCallback();
+      };
+    }
+
+    // 4. Main Autoplay Pipeline Controller
+    function runAutoplayLoop() {
+      if (!isAutoplayEnabled) return;
+
+      // Phase 1: Interactive Record Loop (Verse 1 -> 4)
+      if (!isReviewingPhase && currentAutoplayVerse <= 4) {
+        playReferenceVerse(currentAutoplayVerse, () => {
+          const recBtn = document.getElementById(`rec-btn-${currentAutoplayVerse}`);
+          toggleRecord(currentAutoplayVerse, recBtn);
+        });
+        return;
+      }
+
+      // Phase 1 Completion: Play Combined Audio -> Move to Review Phase
+      if (!isReviewingPhase && currentAutoplayVerse > 4) {
+        isReviewingPhase = true;
+        showToast('All verses recorded! Playing full combined recitation...');
+        toggleFullSurah();
+
+        // Set listener to trigger Review Phase after full audio finishes
+        currentAudio.onended = () => {
+          currentAutoplayVerse = 1;
+          runAutoplayLoop();
+        };
+        return;
+      }
+
+      // Phase 2: Review Loop (Ref 1 -> Voice 1 -> ... -> Ref 4 -> Voice 4)
+      if (isReviewingPhase && currentAutoplayVerse <= 4) {
+        const vNum = currentAutoplayVerse;
+        playReferenceVerse(vNum, () => {
+          playRecordedVoice(vNum, () => {
+            currentAutoplayVerse++;
+            runAutoplayLoop();
+          });
+        });
+        return;
+      }
+
+      // Phase 2 Completion: Final Full Recitation Playback
+      if (isReviewingPhase && currentAutoplayVerse > 4) {
+        showToast('Review cycle completed! Playing final full combined recitation...');
+        toggleFullSurah();
+      }
+    }
+
+    // 5. Trigger start on user action
+    function startAutoplayPipeline() {
+      currentAutoplayVerse = 1;
+      isReviewingPhase = false;
+      runAutoplayLoop();
     }
 
     function trackTimelineProgress(verseNum) {
