@@ -1629,13 +1629,18 @@
     }
 
     async function exportToMp3() {
-      if (Object.keys(recordedBlobs).length < totalVerses) return;
-      showToast('Exporting merged MP3...');
+      // a) Ensure every verse has been recorded
+      if (Object.keys(recordedBlobs).length < totalVerses) {
+        showToast('Record all verses before exporting MP3.');
+        return;
+      }
+      showToast('Preparing MP3 export...');
 
       try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let audioBuffers = [];
 
+        // b) Decode all verse WebM blobs into AudioBuffers
+        const audioBuffers = [];
         for (let i = 1; i <= totalVerses; i++) {
           const arrayBuffer = await recordedBlobs[i].arrayBuffer();
           const decoded = await audioCtx.decodeAudioData(arrayBuffer);
@@ -1643,33 +1648,45 @@
         }
 
         const sampleRate = audioBuffers[0].sampleRate;
-        let totalLength = audioBuffers.reduce((acc, buf) => acc + buf.length, 0);
 
+        // c) Concatenate into a single mono Float32 AudioBuffer
+        const totalLength = audioBuffers.reduce((acc, buf) => acc + buf.length, 0);
         const mergedBuffer = audioCtx.createBuffer(1, totalLength, sampleRate);
         const channelData = mergedBuffer.getChannelData(0);
-
         let offset = 0;
         for (const buf of audioBuffers) {
           channelData.set(buf.getChannelData(0), offset);
           offset += buf.length;
         }
 
-        const offlineCtx = new OfflineAudioContext(1, totalLength, sampleRate);
-        const source = offlineCtx.createBufferSource();
-        source.buffer = mergedBuffer;
-        source.connect(offlineCtx.destination);
-        source.start();
+        // d) Convert Float32 (-1.0..1.0) samples to 16-bit PCM Int16
+        const samples = new Int16Array(totalLength);
+        for (let i = 0; i < totalLength; i++) {
+          const s = Math.max(-1, Math.min(1, channelData[i]));
+          samples[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+        }
 
-        const renderedBuffer = await offlineCtx.startRendering();
+        // e) Encode raw PCM into MP3 chunks via LameJS
+        const mp3encoder = new lamejs.Mp3Encoder(1, sampleRate, 128);
+        const sampleBlockSize = 1152;
+        const mp3Data = [];
+        for (let i = 0; i < samples.length; i += sampleBlockSize) {
+          const chunk = samples.subarray(i, i + sampleBlockSize);
+          const mp3buf = mp3encoder.encodeBuffer(chunk);
+          if (mp3buf.length > 0) mp3Data.push(mp3buf);
+        }
+        const endBuf = mp3encoder.flush();
+        if (endBuf.length > 0) mp3Data.push(endBuf);
+
+        // f) Wrap in Blob and trigger download
+        const mp3Blob = new Blob(mp3Data, { type: 'audio/mp3' });
+        triggerDownload(mp3Blob, 'Surah_Al_Ikhlas_Personal_Recitation.mp3');
+
+        // g) Cleanup and feedback
         audioCtx.close();
-
-        const wavBlob = await bufferToWavBlob(renderedBuffer);
-        const mp3Blob = await encodeBlobToMp3(wavBlob);
-
-        triggerDownload(mp3Blob, `Surah_${currentSurah}_Recitation.mp3`);
         showToast('MP3 export complete!');
       } catch (err) {
-        showToast('Export failed.');
+        showToast('MP3 export failed.');
       }
     }
 
