@@ -596,6 +596,8 @@
       <div class="header-actions">
         <button id="autoplayBtn" class="autoplay-btn practice-only" onclick="toggleAutoplay()">
           <span>🔄</span> Autoplay: <strong id="autoplayStatus">OFF</strong>
+        <button id="autoplayBtn" class="autoplay-btn active practice-only" onclick="toggleAutoplay()">
+          <span>🔄</span> Autoplay: <strong id="autoplayStatus">ON</strong>
         </button>
         <button class="settings-btn" onclick="toggleSettingsMenu()" title="Settings">⚙️</button>
       </div>
@@ -825,7 +827,7 @@
     let isPaused = false;
     let currentVerseIndex = 0;
     let activeQariIdentifier = 'ar.alafasy';
-    let isAutoplayEnabled = false;
+    let isAutoplayEnabled = true;
     let autoplayTimer = null;
     let playbackUpdateFrame = null;
 
